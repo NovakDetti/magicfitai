@@ -24,6 +24,7 @@ export const users = pgTable("users", {
   emailVerified: timestamp("email_verified", { mode: "date" }),
   image: text("image"),
   password: text("password"), // hashed password for credentials auth
+  credits: integer("credits").notNull().default(0), // User credit balance
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 })

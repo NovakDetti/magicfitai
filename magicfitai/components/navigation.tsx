@@ -22,7 +22,7 @@ export function Navigation() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/15">
                 <span className="text-sm font-semibold text-primary">M</span>
               </div>
-              <span className="hidden sm:inline">MAGIC FIT</span>
+              <span>MAGIC FIT</span>
             </Link>
 
             <div className="hidden items-center gap-1 md:flex">
@@ -58,19 +58,16 @@ export function Navigation() {
                   Eredményeim
                 </Link>
               )}
-              <Link
-                href="#szolgaltatasok"
-                className="rounded-[14px] px-4 py-2.5 text-sm font-medium tracking-wide text-foreground/60 transition-all duration-300 hover:bg-white/30 hover:text-foreground dark:hover:bg-white/10"
-              >
-                Szolgáltatások
-              </Link>
 
               {session ? (
                 <div className="ml-3 flex items-center gap-2">
-                  <div className="flex items-center gap-2 rounded-[12px] bg-white/20 px-3 py-1.5">
+                  <Link
+                    href="/profil"
+                    className="flex items-center gap-2 rounded-[12px] bg-white/20 px-3 py-1.5 transition-all duration-300 hover:bg-white/30"
+                  >
                     <User className="h-4 w-4 text-foreground/70" />
                     <span className="text-sm text-foreground/70">{session.user?.name || session.user?.email?.split('@')[0]}</span>
-                  </div>
+                  </Link>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -139,10 +136,14 @@ export function Navigation() {
 
                 {session ? (
                   <div className="mt-3 flex flex-col gap-2">
-                    <div className="flex items-center gap-2 rounded-[12px] bg-white/20 px-4 py-3">
+                    <Link
+                      href="/profil"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-2 rounded-[12px] bg-white/20 px-4 py-3 transition-all duration-300 hover:bg-white/30"
+                    >
                       <User className="h-4 w-4 text-foreground/70" />
                       <span className="text-sm text-foreground/70">{session.user?.name || session.user?.email?.split('@')[0]}</span>
-                    </div>
+                    </Link>
                     <Button
                       size="sm"
                       variant="outline"

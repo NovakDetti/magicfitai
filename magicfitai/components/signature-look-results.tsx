@@ -6,17 +6,18 @@ import {
   ChevronDown,
   ChevronUp,
   Download,
-  FileDown,
   Sparkles,
   ListOrdered,
   ShoppingBag,
   Info,
+  Droplets,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { GlassCard } from "@/components/ui/glass-card"
 import { BeforeAfterSlider } from "@/components/ui/before-after-slider"
 import { cn } from "@/lib/utils"
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
+import type { SkinConditionAnalysis } from "@/lib/gemini"
 
 interface SignatureLookResultsProps {
   sessionId: string
@@ -26,6 +27,7 @@ interface SignatureLookResultsProps {
   pdfUrl?: string | null
   isLoggedIn?: boolean
   onNewAnalysis?: () => void
+  skinAnalysis?: SkinConditionAnalysis | null
   className?: string
 }
 
@@ -46,15 +48,12 @@ export function SignatureLookResults({
   pdfUrl,
   isLoggedIn = false,
   onNewAnalysis,
+  skinAnalysis,
   className,
 }: SignatureLookResultsProps) {
   const [showSteps, setShowSteps] = React.useState(false)
   const [showProducts, setShowProducts] = React.useState(false)
-
-  const handleDownloadPdf = () => {
-    const url = `/api/analysis/${sessionId}/pdf`
-    window.open(url, "_blank")
-  }
+  const [showPrepTips, setShowPrepTips] = React.useState(false)
 
   const handleDownloadImage = () => {
     // Download AI image if available, otherwise the original
@@ -129,10 +128,6 @@ export function SignatureLookResults({
             <Download className="mr-2 h-4 w-4" />
             Kép letöltése
           </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadPdf}>
-            <FileDown className="mr-2 h-4 w-4" />
-            PDF letöltése
-          </Button>
         </div>
       </div>
 
@@ -171,6 +166,124 @@ export function SignatureLookResults({
           </div>
         </GlassCard>
       </div>
+
+      {/* Skin Condition Analysis Section */}
+      {skinAnalysis && (
+        <div className="mx-auto max-w-2xl">
+          <GlassCard variant="subtle" className="p-6 md:p-8">
+            {/* Section Header */}
+            <div className="mb-6 text-center">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#B78C86]/10 px-3 py-1.5">
+                <Droplets className="h-4 w-4 text-[#B78C86]" />
+                <span className="text-xs font-medium text-[#B78C86]">
+                  Bőrelemzés
+                </span>
+              </div>
+              <h2 className="mb-3 text-lg font-medium text-foreground">
+                Részletes bőrállapot-elemzés
+              </h2>
+              <p className="text-sm text-muted-foreground/90 leading-relaxed">
+                Az elemzés non-medical jellegű, kizárólag vizuális indikátorokon alapul.
+                Célja a smink eredményének optimalizálása és a bőrelőkészítés finomhangolása.
+              </p>
+            </div>
+
+            {/* Skin Indicators Grid */}
+            <div className="mb-6 grid gap-4 sm:grid-cols-2">
+              <SkinIndicator
+                label="Hidratáltság"
+                level={skinAnalysis.hydration.level}
+                description={skinAnalysis.hydration.description}
+              />
+              <SkinIndicator
+                label="Bőrfelszín egyenletessége"
+                level={skinAnalysis.texture.level}
+                description={skinAnalysis.texture.description}
+              />
+              <SkinIndicator
+                label="Pórusok láthatósága"
+                level={skinAnalysis.pores.level}
+                description={skinAnalysis.pores.description}
+              />
+              <SkinIndicator
+                label="Faggyútermelés / fénylés"
+                level={skinAnalysis.oiliness.level}
+                description={skinAnalysis.oiliness.description}
+              />
+              <SkinIndicator
+                label="Pigmentáció és bőrtónus"
+                level={skinAnalysis.pigmentation.level}
+                description={skinAnalysis.pigmentation.description}
+              />
+              <SkinIndicator
+                label="Finom vonalak / ráncok"
+                level={skinAnalysis.fineLines.level}
+                description={skinAnalysis.fineLines.description}
+              />
+              <SkinIndicator
+                label="Bőrpír / érzékenység"
+                level={skinAnalysis.sensitivity.level}
+                description={skinAnalysis.sensitivity.description}
+              />
+            </div>
+
+            {/* Makeup Implications */}
+            {skinAnalysis.makeupImplications && (
+              <div className="mb-6 rounded-xl bg-secondary/20 p-4">
+                <h4 className="mb-2 text-sm font-medium text-foreground">
+                  Mit jelent ez a smink szempontjából?
+                </h4>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {skinAnalysis.makeupImplications}
+                </p>
+              </div>
+            )}
+
+            {/* Prep Tips Accordion */}
+            {skinAnalysis.prepTips && skinAnalysis.prepTips.length > 0 && (
+              <div className="space-y-3">
+                <button
+                  onClick={() => setShowPrepTips(!showPrepTips)}
+                  className="flex w-full items-center justify-between rounded-xl bg-secondary/30 p-4 text-left transition-colors hover:bg-secondary/50"
+                >
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="h-5 w-5 text-[#B78C86]" />
+                    <span className="font-medium text-foreground">
+                      Ajánlott bőrelőkészítési fókusz
+                    </span>
+                  </div>
+                  {showPrepTips ? (
+                    <ChevronUp className="h-5 w-5 text-muted-foreground" />
+                  ) : (
+                    <ChevronDown className="h-5 w-5 text-muted-foreground" />
+                  )}
+                </button>
+
+                {showPrepTips && (
+                  <div className="rounded-xl bg-secondary/20 p-5">
+                    <ul className="space-y-2.5">
+                      {skinAnalysis.prepTips.map((tip, i) => (
+                        <li key={i} className="flex items-start gap-2.5 text-sm text-foreground">
+                          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#B78C86]" />
+                          <span>{tip}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Disclaimer */}
+            <div className="mt-6 flex items-center justify-center gap-2 text-center">
+              <Info className="h-3.5 w-3.5 text-muted-foreground/60" />
+              <p className="text-xs text-muted-foreground/80">
+                Ez nem orvosi diagnózis. Bőrproblémák esetén forduljon szakemberhez.
+              </p>
+            </div>
+          </GlassCard>
+        </div>
+      )}
 
       {/* Signature Look Details */}
       <div className="mx-auto max-w-2xl">
@@ -336,6 +449,33 @@ function ProductCategory({
           </li>
         ))}
       </ul>
+    </div>
+  )
+}
+
+// Skin indicator component
+function SkinIndicator({
+  label,
+  level,
+  description,
+}: {
+  label: string
+  level: string
+  description: string
+}) {
+  return (
+    <div className="rounded-xl bg-secondary/20 p-4">
+      <div className="mb-2 flex items-center justify-between">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+        <span className="rounded-full bg-[#B78C86]/10 px-2 py-0.5 text-xs font-medium text-[#B78C86]">
+          {level}
+        </span>
+      </div>
+      <p className="text-sm text-foreground/90 leading-relaxed">
+        {description}
+      </p>
     </div>
   )
 }

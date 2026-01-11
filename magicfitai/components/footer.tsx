@@ -15,15 +15,15 @@ export function Footer() {
             </p>
           </div>
 
-          <nav className="flex flex-wrap justify-center gap-8 text-sm">
+          <nav className="flex flex-wrap justify-center gap-4 md:gap-8 text-sm">
             <a
-              href="#"
+              href="/felhasznalasi-feltetelek"
               className="tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
-              Impresszum
+              Felhasználási feltételek
             </a>
             <a
-              href="#"
+              href="/adatvedelem"
               className="tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
               Adatvédelem

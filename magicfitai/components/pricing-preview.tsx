@@ -5,24 +5,39 @@ import Link from "next/link"
 
 const plans = [
   {
-    name: "1 kredit",
+    name: "📦 1 kredit",
     price: "450 Ft",
-    description: "Egy teljes elemzés",
-    features: ["1 elemzés", "3 személyre szabott look", "PDF összefoglaló"],
+    description: "Egyszeri konzultáció",
+    features: [
+      "1 teljes AI sminkelemzés",
+      "3 személyre szabott sminklook",
+      "Részletes leírás és vizuális eredmény",
+      "Letölthető összefoglaló",
+    ],
   },
   {
-    name: "5 kredit",
+    name: "⭐ 5 kredit",
     price: "2 025 Ft",
+    pricePerUnit: "(405 Ft / kredit)",
     badge: "Leggyakrabban választott",
     popular: true,
-    description: "Rugalmas több alkalomra",
-    features: ["5 elemzés", "Részletes magyarázat", "Letölthető összefoglaló"],
+    description: "Több alkalomra, kedvezőbb áron",
+    features: [
+      "5 teljes AI sminkelemzés",
+      "Ugyanaz a tartalom, mint az egyszeri konzultációnál",
+      "Rugalmas felhasználás, amikor szükséges",
+    ],
   },
   {
-    name: "10 kredit",
-    price: "4 000 Ft",
-    description: "Legjobb ár/érték",
-    features: ["10 elemzés", "Korlátlan elérés", "Prioritás támogatás"],
+    name: "💎 10 kredit",
+    price: "3 825 Ft",
+    pricePerUnit: "(382,50 Ft / kredit)",
+    description: "Legjobb ár / elemzés",
+    features: [
+      "10 teljes AI sminkelemzés",
+      "Azonos szolgáltatás, még kedvezőbb egységáron",
+      "Ideális rendszeres használatra",
+    ],
   },
 ]
 
@@ -39,7 +54,7 @@ export function PricingPreview() {
             <span className="block font-medium">lehetőségek</span>
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            Egyszeri szolgáltatás, további kötelezettség nélkül.
+            Ugyanaz a szolgáltatás, kedvezőbb egységár több kredit vásárlásakor.
           </p>
         </div>
 
@@ -69,9 +84,16 @@ export function PricingPreview() {
                 </div>
 
                 <div className="mb-8">
-                  <span className="text-4xl font-light tracking-tight text-foreground">
-                    {plan.price}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-4xl font-light tracking-tight text-foreground">
+                      {plan.price}
+                    </span>
+                    {plan.pricePerUnit && (
+                      <span className="mt-1 text-sm text-muted-foreground">
+                        {plan.pricePerUnit}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <ul className="mb-8 flex-1 space-y-4">
@@ -99,7 +121,14 @@ export function PricingPreview() {
           ))}
         </div>
 
+        {/* Trust-building note */}
         <div className="mt-12 text-center">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Minden konzultáció ugyanazt a részletes elemzést és sminkajánlást tartalmazza – a különbség kizárólag az egységárban van.
+          </p>
+        </div>
+
+        <div className="mt-8 text-center">
           <Button
             variant="ghost"
             className="text-muted-foreground hover:text-foreground"

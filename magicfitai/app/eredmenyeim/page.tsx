@@ -13,7 +13,6 @@ import {
   Loader2,
   CreditCard,
   Plus,
-  FileDown,
   Eye,
 } from "lucide-react"
 import { Navigation } from "@/components/navigation"
@@ -318,19 +317,6 @@ export default function EredmenyeimPage() {
                               Megtekintés
                             </Button>
                           </Link>
-                          {analysis.pdfUrl && (
-                            <Button
-                              variant="secondary"
-                              size="sm"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                window.open(analysis.pdfUrl!, "_blank")
-                              }}
-                            >
-                              <FileDown className="mr-1.5 h-3.5 w-3.5" />
-                              PDF
-                            </Button>
-                          )}
                         </div>
                       )}
                     </div>
@@ -383,9 +369,9 @@ export default function EredmenyeimPage() {
               >
                 <div>
                   <p className="text-sm font-medium text-foreground">10 kredit</p>
-                  <p className="text-xs text-muted-foreground">4 000 Ft</p>
+                  <p className="text-xs text-muted-foreground">3 825 Ft</p>
                 </div>
-                <span className="text-xs font-medium text-primary">-11%</span>
+                <span className="text-xs font-medium text-primary">-15%</span>
               </button>
             </div>
 

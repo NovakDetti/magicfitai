@@ -21,9 +21,9 @@ const faqs = [
       "Nem. Az útmutatás esztétikai jellegű, és nem helyettesíti kozmetikus vagy bőrgyógyász szakvéleményét. Bőrrel kapcsolatos aggályok esetén javasoljuk szakember felkeresését.",
   },
   {
-    question: "Mit jelent a független szemlélet?",
+    question: "Milyen termékeket ajánlotok?",
     answer:
-      "Nem konkrét márkákat vagy termékeket ajánlunk, hanem színeket, árnyalatokat és textúrákat. A végső választás — beleértve az árkategóriát is — teljes mértékben az Öné.",
+      "Konkrét márkákat és termékeket ajánlunk, amelyek megfelelnek az Ön bőrtónusának és stílusának. Az ajánlásaink különböző árkategóriákban mozognak, hogy mindenki megtalálhassa a számára ideális terméket.",
   },
   {
     question: "Mikor kapom meg az összefoglalót?",

@@ -1,6 +1,20 @@
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
 
 /**
+ * Escape HTML to prevent XSS and ensure proper character encoding
+ */
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }
+  return text.replace(/[&<>"']/g, (char) => map[char] || char)
+}
+
+/**
  * Generate PDF content as HTML (for server-side PDF generation)
  * This creates a print-optimized HTML that can be converted to PDF
  */
@@ -13,7 +27,8 @@ export function generatePdfHtml(
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <title>Smink Útmutató - Magic Fit AI</title>
   <style>
     @page {
@@ -27,10 +42,14 @@ export function generatePdfHtml(
     }
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      font-size: 12pt;
-      line-height: 1.6;
+      font-size: 11pt;
+      line-height: 1.5;
       color: #1F1F22;
       background: #fff;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      max-width: 100%;
     }
     .header {
       text-align: center;
@@ -73,21 +92,28 @@ export function generatePdfHtml(
     }
     .observation {
       background: #F8F7F5;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-radius: 8px;
       border: 1px solid #E0DDDA;
+      min-width: 0;
+      max-width: 100%;
     }
     .observation strong {
       color: #B78C86;
-      font-size: 9pt;
+      font-size: 8pt;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       display: block;
       margin-bottom: 2px;
     }
     .observation span {
-      font-size: 11pt;
+      font-size: 10pt;
       color: #1F1F22;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      display: block;
+      max-width: 100%;
     }
     .notes {
       background: #F8F7F5;
@@ -97,14 +123,18 @@ export function generatePdfHtml(
       font-style: italic;
       color: #5A5A60;
       margin-bottom: 16px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
     .look {
       background: #FAFAFA;
       border: 1px solid #E0DDDA;
       border-radius: 12px;
-      padding: 16px;
+      padding: 14px;
       margin: 16px 0;
       page-break-inside: avoid;
+      max-width: 100%;
+      min-width: 0;
     }
     .look-header {
       display: flex;
@@ -131,15 +161,21 @@ export function generatePdfHtml(
     }
     .look > p {
       color: #5A5A60;
-      font-size: 11pt;
+      font-size: 10pt;
       margin-bottom: 12px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      max-width: 100%;
     }
     .section {
       background: white;
       border: 1px solid #E0DDDA;
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px;
       margin-bottom: 10px;
+      max-width: 100%;
+      min-width: 0;
     }
     .section-title {
       font-weight: 600;
@@ -154,13 +190,21 @@ export function generatePdfHtml(
       padding-left: 18px;
     }
     .section li {
-      margin-bottom: 4px;
-      font-size: 10pt;
+      margin-bottom: 3px;
+      font-size: 9pt;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      max-width: 100%;
     }
     .products-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
+      gap: 10px;
+    }
+    .product-category {
+      min-width: 0;
+      max-width: 100%;
     }
     .product-category h4 {
       color: #7A7A80;
@@ -171,11 +215,15 @@ export function generatePdfHtml(
     }
     .product-category ul {
       margin: 0;
-      padding-left: 14px;
-      font-size: 10pt;
+      padding-left: 12px;
+      font-size: 9pt;
     }
     .product-category li {
       margin-bottom: 2px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      max-width: 100%;
     }
     .footer {
       margin-top: 30px;
@@ -203,48 +251,48 @@ export function generatePdfHtml(
   <div class="observations-grid">
     <div class="observation">
       <strong>Arcforma</strong>
-      <span>${observations.faceShape}</span>
+      <span>${escapeHtml(observations.faceShape)}</span>
     </div>
     <div class="observation">
       <strong>Bőrtónus</strong>
-      <span>${observations.skinTone}</span>
+      <span>${escapeHtml(observations.skinTone)}</span>
     </div>
     <div class="observation">
       <strong>Alaptónus</strong>
-      <span>${observations.undertone}</span>
+      <span>${escapeHtml(observations.undertone)}</span>
     </div>
     <div class="observation">
       <strong>Kontraszt</strong>
-      <span>${observations.contrast}</span>
+      <span>${escapeHtml(observations.contrast)}</span>
     </div>
     <div class="observation">
       <strong>Szemforma</strong>
-      <span>${observations.eyeShape}</span>
+      <span>${escapeHtml(observations.eyeShape)}</span>
     </div>
     <div class="observation">
       <strong>Szemöldök</strong>
-      <span>${observations.brows}</span>
+      <span>${escapeHtml(observations.brows)}</span>
     </div>
     <div class="observation">
       <strong>Ajkak</strong>
-      <span>${observations.lips}</span>
+      <span>${escapeHtml(observations.lips)}</span>
     </div>
   </div>
-  ${observations.notes ? `<div class="notes">${observations.notes}</div>` : ""}
+  ${observations.notes ? `<div class="notes">${escapeHtml(observations.notes)}</div>` : ""}
 
   <h2>Look Javaslatok</h2>
   ${looks.map((look, index) => `
     <div class="look">
       <div class="look-header">
         <div class="look-number">${index + 1}</div>
-        <h3>${look.title}</h3>
+        <h3>${escapeHtml(look.title)}</h3>
       </div>
-      <p>${look.why}</p>
+      <p>${escapeHtml(look.why)}</p>
 
       <div class="section">
         <div class="section-title">Lépések</div>
         <ol>
-          ${look.steps.map((step) => `<li>${step}</li>`).join("")}
+          ${look.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
         </ol>
       </div>
 
@@ -253,23 +301,23 @@ export function generatePdfHtml(
         <div class="products-grid">
           <div class="product-category">
             <h4>Alap</h4>
-            <ul>${look.products.base.map((p) => `<li>${p}</li>`).join("")}</ul>
+            <ul>${look.products.base.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul>
           </div>
           <div class="product-category">
             <h4>Szemek</h4>
-            <ul>${look.products.eyes.map((p) => `<li>${p}</li>`).join("")}</ul>
+            <ul>${look.products.eyes.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul>
           </div>
           <div class="product-category">
             <h4>Szemöldök</h4>
-            <ul>${look.products.brows.map((p) => `<li>${p}</li>`).join("")}</ul>
+            <ul>${look.products.brows.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul>
           </div>
           <div class="product-category">
             <h4>Ajkak</h4>
-            <ul>${look.products.lips.map((p) => `<li>${p}</li>`).join("")}</ul>
+            <ul>${look.products.lips.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul>
           </div>
           <div class="product-category">
             <h4>Arc</h4>
-            <ul>${look.products.face.map((p) => `<li>${p}</li>`).join("")}</ul>
+            <ul>${look.products.face.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul>
           </div>
         </div>
       </div>

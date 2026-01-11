@@ -42,11 +42,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate occasion
-    const validOccasions = ["everyday", "work", "evening", "special"]
-    if (!occasion || !validOccasions.includes(occasion)) {
+    // Validate style
+    const validStyles = ["everyday", "date", "party", "smokey", "elegant"]
+    if (!occasion || !validStyles.includes(occasion)) {
       return NextResponse.json(
-        { error: "Érvényes alkalom megadása kötelező." },
+        { error: "Érvényes smink stílus megadása kötelező." },
         { status: 400 }
       )
     }

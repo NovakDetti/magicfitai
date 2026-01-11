@@ -43,13 +43,39 @@ interface GeneratePDFParams {
  */
 async function imageUrlToBase64(url: string): Promise<string | null> {
   try {
-    const response = await fetch(url)
+    // Ensure we have an absolute URL
+    let absoluteUrl = url
+
+    // If URL is relative, make it absolute using the environment base URL
+    if (url.startsWith("/")) {
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+      absoluteUrl = `${baseUrl}${url}`
+    }
+
+    console.log(`Fetching image from: ${absoluteUrl}`)
+
+    const response = await fetch(absoluteUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0',
+      },
+      // Add timeout
+      signal: AbortSignal.timeout(10000), // 10 seconds timeout
+    })
+
+    if (!response.ok) {
+      console.error(`Failed to fetch image: ${response.status} ${response.statusText}`)
+      return null
+    }
+
     const arrayBuffer = await response.arrayBuffer()
     const base64 = Buffer.from(arrayBuffer).toString("base64")
     const contentType = response.headers.get("content-type") || "image/jpeg"
+
+    console.log(`Successfully converted image to base64: ${url.substring(0, 50)}...`)
+
     return `data:${contentType};base64,${base64}`
   } catch (error) {
-    console.error("Failed to convert image to base64:", error)
+    console.error("Failed to convert image to base64:", error, "URL:", url)
     return null
   }
 }
@@ -112,6 +138,7 @@ export async function generateAnalysisPDF({
   doc.text("Személyre szabott sminkelemzés", pageWidth / 2, 62, { align: "center" })
 
   // Original image (if available)
+  let coverImageAdded = false
   try {
     const imageData = await imageUrlToBase64(beforeImageUrl)
     if (imageData) {
@@ -119,9 +146,20 @@ export async function generateAnalysisPDF({
       const imgHeight = 100
       const imgX = (pageWidth - imgWidth) / 2
       doc.addImage(imageData, "JPEG", imgX, 80, imgWidth, imgHeight)
+      coverImageAdded = true
+    } else {
+      console.warn("Cover image could not be loaded, PDF will continue without it")
     }
   } catch (error) {
     console.error("Failed to add before image:", error)
+    console.log("Continuing PDF generation without cover image")
+  }
+
+  // If no image, add a placeholder text
+  if (!coverImageAdded) {
+    doc.setFontSize(FONT_SIZES.body)
+    doc.setTextColor(...COLORS.muted)
+    doc.text("(Kép nem elérhető)", pageWidth / 2, 130, { align: "center" })
   }
 
   // Occasion and date
@@ -290,6 +328,8 @@ export async function generateAnalysisPDF({
 
     // After image (if available)
     const afterUrl = look.afterImageUrl || afterImageUrls[i]
+    let lookImageAdded = false
+
     if (afterUrl) {
       try {
         const imageData = await imageUrlToBase64(afterUrl)
@@ -305,12 +345,17 @@ export async function generateAnalysisPDF({
           doc.text(splitWhy, margin + imgWidth + 10, y + 5)
 
           y += imgHeight + 10
+          lookImageAdded = true
+        } else {
+          console.warn(`Look ${i + 1} image could not be loaded`)
         }
       } catch (error) {
         console.error("Failed to add look image:", error)
       }
-    } else {
-      // Just description without image
+    }
+
+    // If no image was added, show description full-width
+    if (!lookImageAdded) {
       doc.setFontSize(FONT_SIZES.body)
       doc.setTextColor(...COLORS.text)
       const splitWhy = doc.splitTextToSize(look.why, contentWidth)

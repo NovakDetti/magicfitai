@@ -4,12 +4,12 @@ import { eq } from "drizzle-orm"
 import { analyzeImage } from "@/lib/gemini"
 import { uploadBase64Image, uploadPdf } from "@/lib/storage"
 import { generatePdfBuffer } from "@/lib/pdf"
-import { applyMakeupToImage, isInpaintingAvailable } from "@/lib/inpainting"
+import { generateMakeupTransfer } from "@/lib/mad-service"
 
 /**
  * Process an analysis session:
  * 1. Run Gemini analysis (text + observations)
- * 2. Generate after images using inpainting pipeline
+ * 2. Generate after images using MAD service
  * 3. Generate PDF
  * 4. Store all assets
  * 5. Update session status
@@ -78,58 +78,55 @@ export async function processAnalysisSession(sessionId: string): Promise<void> {
       session.toggles
     )
 
-    // Generate after images using inpainting pipeline
+    // Generate after images using MAD service (Gemini-based makeup transfer)
     const afterImageUrls: string[] = []
-    const inpaintingAvailable = isInpaintingAvailable()
+    console.log(`Generating makeup preview image for session: ${sessionId}`)
 
-    if (inpaintingAvailable) {
-      console.log(`Generating makeup preview images for session: ${sessionId}`)
+    // Generate image for the primary (first) look
+    const primaryLook = looks[0]
 
-      // Only generate for the primary (first) look to save time/cost
-      // The signature look page shows only one look anyway
-      const primaryLook = looks[0]
-
-      if (primaryLook) {
-        try {
-          const result = await applyMakeupToImage(
-            imageBase64,
-            mimeType,
-            primaryLook,
-            observations,
-            sessionId
-          )
-
-          if (result.success && result.imageBase64) {
-            // Upload the generated image
-            const url = await uploadBase64Image(result.imageBase64, "after-images")
-            afterImageUrls.push(url)
-            console.log(
-              `Inpainting successful for look "${primaryLook.title}" ` +
-              `(quality: ${result.qualityScore?.toFixed(2)}, attempts: ${result.attemptCount})`
-            )
-          } else {
-            // Fallback was used - log the reason
-            console.log(
-              `Inpainting fallback for look "${primaryLook.title}": ${result.fallbackReason}`
-            )
-            afterImageUrls.push("") // No image
-          }
-        } catch (error) {
-          console.error(`Inpainting failed for look "${primaryLook.title}":`, error)
-          afterImageUrls.push("")
+    if (primaryLook) {
+      try {
+        // Get style description from occasion
+        const styleDescriptions: Record<string, string> = {
+          everyday: "Természetes, fresh look",
+          date: "Romantikus, lágy smink",
+          party: "Merész, csillogó smink",
+          smokey: "Intenzív, drámai smokey eyes",
+          elegant: "Kifinomult, elegáns smink"
         }
-      }
 
-      // Fill remaining slots with empty strings for other looks
-      while (afterImageUrls.length < looks.length) {
+        const result = await generateMakeupTransfer({
+          sourceImageBase64: imageBase64,
+          sourceImageMimeType: mimeType,
+          style: session.occasion,
+          styleDescription: styleDescriptions[session.occasion] || "Professzionális smink",
+          observations: {
+            skinTone: observations.skinTone,
+            undertone: observations.undertone,
+            eyeShape: observations.eyeShape,
+            faceShape: observations.faceShape,
+          },
+        })
+
+        if (result.success && result.afterImageUrl) {
+          // Upload the generated image
+          const url = await uploadBase64Image(result.afterImageUrl, "after-images")
+          afterImageUrls.push(url)
+          console.log(`MAD service successful for look "${primaryLook.title}"`)
+        } else {
+          console.log(`MAD service failed for look "${primaryLook.title}": ${result.error}`)
+          afterImageUrls.push("") // No image
+        }
+      } catch (error) {
+        console.error(`MAD service error for look "${primaryLook.title}":`, error)
         afterImageUrls.push("")
       }
-    } else {
-      console.log("Inpainting not available - skipping image generation")
-      // No inpainting available, fill with empty strings
-      for (let i = 0; i < looks.length; i++) {
-        afterImageUrls.push("")
-      }
+    }
+
+    // Fill remaining slots with empty strings for other looks
+    while (afterImageUrls.length < looks.length) {
+      afterImageUrls.push("")
     }
 
     // Add after image URLs to looks

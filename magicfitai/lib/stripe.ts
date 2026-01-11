@@ -35,7 +35,7 @@ export const CREDIT_PRICE_HUF = 450
 export const CREDIT_PACKAGES = {
   single: { credits: 1, pricePerCredit: 450, totalPrice: 450 },
   pack5: { credits: 5, pricePerCredit: 405, totalPrice: 2025, discount: 10 },
-  pack10: { credits: 10, pricePerCredit: 400, totalPrice: 4000, discount: 11 },
+  pack10: { credits: 10, pricePerCredit: 382.5, totalPrice: 3825, discount: 15 },
 } as const
 
 export type CreditPackage = keyof typeof CREDIT_PACKAGES

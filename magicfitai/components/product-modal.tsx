@@ -54,7 +54,7 @@ export function ProductModal({ isOpen, onClose, lookTitle }: ProductModalProps) 
 
           <div className="rounded-[14px] bg-secondary/60 p-4">
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Megjegyzés:</span> Márkafüggetlen ajánlás.
+              <span className="font-semibold text-foreground">Megjegyzés:</span> Konkrét márka ajánlásokat talál a részletes elemzésben.
             </p>
           </div>
 

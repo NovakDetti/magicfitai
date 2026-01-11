@@ -14,6 +14,7 @@ export const authOptions: NextAuthOptions = {
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }) as NextAuthOptions["adapter"],
+  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },

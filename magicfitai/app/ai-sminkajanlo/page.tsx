@@ -9,15 +9,7 @@ import { GlassCard } from "@/components/ui/glass-card"
 import { Stepper, type Step } from "@/components/ui/stepper"
 import { Button } from "@/components/ui/button"
 import { SignatureLookResults } from "@/components/signature-look-results"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { StyleToggle, type StylePreference } from "@/components/ui/style-toggle"
 import {
   Dialog,
   DialogContent,
@@ -38,6 +30,7 @@ import {
   CreditCard,
   UserPlus,
   LogIn,
+  Check,
 } from "lucide-react"
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
 
@@ -62,11 +55,37 @@ const WIZARD_STEPS: Step[] = [
   { id: 3, title: "Eredmények" },
 ]
 
-const OCCASIONS = [
-  { value: "everyday", label: "Hétköznapi" },
-  { value: "work", label: "Munkahelyi" },
-  { value: "evening", label: "Esti" },
-  { value: "special", label: "Különleges alkalom" },
+const MAKEUP_STYLES = [
+  {
+    value: "everyday",
+    label: "Hétköznapi",
+    description: "Természetes, fresh look minden napra",
+    icon: "☀️"
+  },
+  {
+    value: "date",
+    label: "Randi",
+    description: "Romantikus, lágy smink különleges pillanatokra",
+    icon: "💕"
+  },
+  {
+    value: "party",
+    label: "Buli",
+    description: "Merész, csillogó smink bulizáshoz",
+    icon: "🎉"
+  },
+  {
+    value: "smokey",
+    label: "Smokey",
+    description: "Intenzív, drámai szemsmink",
+    icon: "🌙"
+  },
+  {
+    value: "elegant",
+    label: "Elegáns",
+    description: "Kifinomult, elegáns megjelenés",
+    icon: "✨"
+  },
 ]
 
 // ============================================
@@ -89,7 +108,6 @@ export default function AISminkajanloPage() {
   const [occasion, setOccasion] = useState("")
   const [hasGlasses, setHasGlasses] = useState(false)
   const [hasSensitiveSkin, setHasSensitiveSkin] = useState(false)
-  const [stylePreference, setStylePreference] = useState<StylePreference>("letisztult")
 
   // Session & Payment
   const [isCreatingSession, setIsCreatingSession] = useState(false)
@@ -183,7 +201,6 @@ export default function AISminkajanloPage() {
       formData.append("occasion", occasion)
       formData.append("hasGlasses", String(hasGlasses))
       formData.append("hasSensitiveSkin", String(hasSensitiveSkin))
-      formData.append("stylePreference", stylePreference)
 
       const res = await fetch("/api/create-analysis-session", {
         method: "POST",
@@ -342,7 +359,6 @@ export default function AISminkajanloPage() {
     setOccasion("")
     setHasGlasses(false)
     setHasSensitiveSkin(false)
-    setStylePreference("letisztult")
     setAnalysisSessionId(null)
     setGuestToken(null)
     setAnalysisResult(null)
@@ -371,8 +387,9 @@ export default function AISminkajanloPage() {
               <span className="block font-medium">Személyre szabott sminktanácsok</span>
             </h1>
             <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Töltse fel egy portréfotót, és az AI elemzi arcvonásait, majd három
-              egyedi sminkvariációt készít az Ön számára.
+              Töltse fel egy portréfotót, és az AI elemzi arcvonásait, bőrállapotát, majd
+              egy személyre szabott sminkjavaslatot készít az Ön számára — részletes lépésekkel
+              és bőrelőkészítési tippekkel.
             </p>
           </div>
 
@@ -469,23 +486,43 @@ export default function AISminkajanloPage() {
                     </p>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="mb-2 block text-sm font-medium text-foreground">
-                        Milyen alkalomra készülsz?
+                      <label className="mb-4 block text-lg font-semibold text-foreground">
+                        Válassz egy smink stílust
                       </label>
-                      <Select value={occasion} onValueChange={setOccasion}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Válassz alkalmat" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {OCCASIONS.map((occ) => (
-                            <SelectItem key={occ.value} value={occ.value}>
-                              {occ.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {MAKEUP_STYLES.map((style) => (
+                          <button
+                            key={style.value}
+                            onClick={() => setOccasion(style.value)}
+                            className={`group relative overflow-hidden rounded-[16px] border-2 p-4 text-left transition-all duration-200 ${
+                              occasion === style.value
+                                ? "border-primary bg-primary/10 shadow-lg shadow-primary/20"
+                                : "border-border/50 bg-card hover:border-primary/50 hover:shadow-md"
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <span className="text-3xl">{style.icon}</span>
+                              <div className="flex-1">
+                                <h3 className="font-semibold text-foreground">
+                                  {style.label}
+                                </h3>
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                  {style.description}
+                                </p>
+                              </div>
+                              {occasion === style.value && (
+                                <div className="absolute right-3 top-3">
+                                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary">
+                                    <Check className="h-4 w-4 text-primary-foreground" />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div className="space-y-3 rounded-[14px] bg-secondary/30 p-4">
@@ -512,12 +549,6 @@ export default function AISminkajanloPage() {
                         </span>
                       </label>
                     </div>
-
-                    {/* Style preference toggle */}
-                    <StyleToggle
-                      value={stylePreference}
-                      onChange={setStylePreference}
-                    />
                   </div>
 
                   {analysisError && (
