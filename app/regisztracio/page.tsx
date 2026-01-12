@@ -148,11 +148,13 @@ export default function RegisztracioPage() {
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="name"
+                    name="name"
                     type="text"
                     placeholder="Kiss Anna"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
+                    autoComplete="name"
                     className="w-full pl-10"
                   />
                 </div>
@@ -169,11 +171,13 @@ export default function RegisztracioPage() {
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="pelda@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    autoComplete="email"
                     className="w-full pl-10"
                   />
                 </div>
@@ -190,12 +194,14 @@ export default function RegisztracioPage() {
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Legalább 6 karakter"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
+                    autoComplete="new-password"
                     className="w-full pl-10 pr-10"
                   />
                   <button
@@ -223,12 +229,14 @@ export default function RegisztracioPage() {
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
+                    name="confirmPassword"
                     type={showPassword ? "text" : "password"}
                     placeholder="Jelszó újra"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                     minLength={6}
+                    autoComplete="new-password"
                     className="w-full pl-10"
                   />
                 </div>
@@ -252,10 +260,6 @@ export default function RegisztracioPage() {
 
             <p className="mt-6 text-center text-xs text-muted-foreground">
               A regisztrációval elfogadod az{" "}
-              <Link href="/aszf" className="text-primary hover:underline">
-                Általános Szerződési Feltételeket
-              </Link>{" "}
-              és az{" "}
               <Link
                 href="/adatvedelem"
                 className="text-primary hover:underline"

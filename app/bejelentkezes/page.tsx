@@ -148,11 +148,13 @@ function BejelentkezesContent() {
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="pelda@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    autoComplete="email"
                     className="w-full pl-10"
                   />
                 </div>
@@ -169,11 +171,13 @@ function BejelentkezesContent() {
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Jelszó"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    autoComplete="current-password"
                     className="w-full pl-10 pr-10"
                   />
                   <button
@@ -208,10 +212,6 @@ function BejelentkezesContent() {
 
             <p className="mt-6 text-center text-xs text-muted-foreground">
               A bejelentkezéssel elfogadod az{" "}
-              <Link href="/aszf" className="text-primary hover:underline">
-                Általános Szerződési Feltételeket
-              </Link>{" "}
-              és az{" "}
               <Link
                 href="/adatvedelem"
                 className="text-primary hover:underline"
