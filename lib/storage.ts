@@ -114,15 +114,14 @@ export async function uploadBase64Image(
         format: "webp", // WebP is ~30% smaller than JPEG
       })
 
-      buffer = optimized.buffer
       const savings = Math.round(((originalSize - optimized.size) / originalSize) * 100)
 
       console.log(
         `Image optimized: ${(originalSize / 1024).toFixed(0)}KB -> ${(optimized.size / 1024).toFixed(0)}KB (${savings}% savings)`
       )
 
-      // Use optimized format
-      return uploadFile(buffer, prefix, optimized.format, `image/${optimized.format}`)
+      // Use optimized format and buffer
+      return uploadFile(optimized.buffer, prefix, optimized.format, `image/${optimized.format}`)
     } catch (error) {
       console.error("Image optimization failed, uploading original:", error)
       // Fall through to upload original if optimization fails
