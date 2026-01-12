@@ -360,7 +360,6 @@ export default function AISminkajanloPage() {
     setAnalysisSessionId(null)
     setGuestToken(null)
     setAnalysisResult(null)
-    setPdfUrl(null)
     setAnalysisError(null)
   }
 
