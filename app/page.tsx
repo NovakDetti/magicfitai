@@ -1,29 +1,27 @@
-import { Navigation } from "@/components/navigation"
-import { HeroSection } from "@/components/hero-section"
-import { QuickPreview } from "@/components/quick-preview"
-import { PhotoTipsSection } from "@/components/photo-tips-section"
-import { AIAnalysisSection } from "@/components/ai-analysis-section"
-import { MakeupStylesSection } from "@/components/makeup-styles-section"
-import { HowItWorks } from "@/components/how-it-works"
-import { PricingPreview } from "@/components/pricing-preview"
-import { FAQSection } from "@/components/faq-section"
-import { Footer } from "@/components/footer"
-
 export default function HomePage() {
   return (
-    <>
-      <Navigation />
-      <main className="min-h-screen pt-16">
-        <HeroSection />
-        <QuickPreview />
-        <PhotoTipsSection />
-        <AIAnalysisSection />
-        <MakeupStylesSection />
-        <HowItWorks />
-        <PricingPreview />
-        <FAQSection />
-        <Footer />
-      </main>
-    </>
+    <div style={{
+      padding: '50px',
+      textAlign: 'center',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f5f5f5'
+    }}>
+      <h1 style={{ fontSize: '48px', marginBottom: '20px', color: '#333' }}>
+        🎨 Magic Fit AI
+      </h1>
+      <p style={{ fontSize: '24px', marginBottom: '20px', color: '#666' }}>
+        Személyre szabott sminktanácsok AI-val
+      </p>
+      <p style={{ fontSize: '16px', color: '#999' }}>
+        Az oldal hamarosan elérhető lesz!
+      </p>
+      <p style={{ fontSize: '14px', color: '#aaa', marginTop: '40px' }}>
+        Build: {new Date().toISOString()}
+      </p>
+    </div>
   )
 }
