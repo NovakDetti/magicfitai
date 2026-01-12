@@ -8,6 +8,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { nanoid } from "nanoid"
 import fs from "fs/promises"
 import path from "path"
+import { optimizeImage } from "./image-optimizer"
 
 // Check if we're using R2 or local storage
 const USE_R2 = !!(
@@ -91,17 +92,44 @@ export async function uploadFile(
 }
 
 /**
- * Upload an image from base64 data
+ * Upload an image from base64 data with optimization
  */
 export async function uploadBase64Image(
   base64Data: string,
-  prefix: string
+  prefix: string,
+  skipOptimization: boolean = false
 ): Promise<string> {
   // Remove data URL prefix if present
   const base64Content = base64Data.replace(/^data:image\/\w+;base64,/, "")
-  const buffer = Buffer.from(base64Content, "base64")
+  let buffer = Buffer.from(base64Content, "base64")
 
-  // Detect image type from base64 header or default to png
+  // Optimize image to reduce storage costs (unless explicitly skipped)
+  if (!skipOptimization) {
+    try {
+      const originalSize = buffer.length
+      const optimized = await optimizeImage(buffer, {
+        maxWidth: 1200,
+        maxHeight: 1600,
+        quality: 85,
+        format: "webp", // WebP is ~30% smaller than JPEG
+      })
+
+      buffer = optimized.buffer
+      const savings = Math.round(((originalSize - optimized.size) / originalSize) * 100)
+
+      console.log(
+        `Image optimized: ${(originalSize / 1024).toFixed(0)}KB -> ${(optimized.size / 1024).toFixed(0)}KB (${savings}% savings)`
+      )
+
+      // Use optimized format
+      return uploadFile(buffer, prefix, optimized.format, `image/${optimized.format}`)
+    } catch (error) {
+      console.error("Image optimization failed, uploading original:", error)
+      // Fall through to upload original if optimization fails
+    }
+  }
+
+  // Fallback: upload original image
   let extension = "png"
   let contentType = "image/png"
   if (base64Data.startsWith("data:image/jpeg")) {
