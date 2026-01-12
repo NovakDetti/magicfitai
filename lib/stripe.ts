@@ -25,17 +25,24 @@ export const stripe = {
   },
 }
 
-// Single credit price ID - 1 credit = 450 HUF
-export const CREDIT_PRICE_ID = process.env.STRIPE_CREDIT_PRICE_ID!
-
-// Price per credit in HUF
-export const CREDIT_PRICE_HUF = 450
+// Stripe Price IDs for each credit package
+export const PRICE_IDS = {
+  1: process.env.STRIPE_PRICE_ID_1_CREDIT!, // 1 kredit - 450 Ft
+  5: process.env.STRIPE_PRICE_ID_5_CREDITS!, // 5 kredit - 2025 Ft
+  10: process.env.STRIPE_PRICE_ID_10_CREDITS!, // 10 kredit - 3825 Ft
+} as const
 
 // Credit packages with discounts
 export const CREDIT_PACKAGES = {
-  single: { credits: 1, pricePerCredit: 450, totalPrice: 450 },
-  pack5: { credits: 5, pricePerCredit: 405, totalPrice: 2025, discount: 10 },
-  pack10: { credits: 10, pricePerCredit: 382.5, totalPrice: 3825, discount: 15 },
+  single: { credits: 1, pricePerCredit: 450, totalPrice: 450, priceId: PRICE_IDS[1] },
+  pack5: { credits: 5, pricePerCredit: 405, totalPrice: 2025, discount: 10, priceId: PRICE_IDS[5] },
+  pack10: {
+    credits: 10,
+    pricePerCredit: 382.5,
+    totalPrice: 3825,
+    discount: 15,
+    priceId: PRICE_IDS[10],
+  },
 } as const
 
 export type CreditPackage = keyof typeof CREDIT_PACKAGES
@@ -51,7 +58,7 @@ interface CreateCheckoutParams {
 
 /**
  * Create a Stripe Checkout session for purchasing credits
- * Uses a single Price ID with quantity = credits
+ * Uses package-specific Price IDs (1, 5, or 10 credits)
  */
 export async function createCheckoutSession({
   credits,
@@ -61,12 +68,11 @@ export async function createCheckoutSession({
   successUrl,
   cancelUrl,
 }: CreateCheckoutParams): Promise<Stripe.Checkout.Session> {
-  if (!CREDIT_PRICE_ID) {
-    throw new Error("STRIPE_CREDIT_PRICE_ID is not defined")
-  }
+  // Get the correct Price ID based on credit amount
+  const priceId = PRICE_IDS[credits as keyof typeof PRICE_IDS]
 
-  if (credits < 1 || credits > 100) {
-    throw new Error("Credits must be between 1 and 100")
+  if (!priceId) {
+    throw new Error(`No price ID configured for ${credits} credits. Must be 1, 5, or 10.`)
   }
 
   const metadata: Record<string, string> = {
@@ -88,8 +94,8 @@ export async function createCheckoutSession({
     payment_method_types: ["card"],
     line_items: [
       {
-        price: CREDIT_PRICE_ID,
-        quantity: credits,
+        price: priceId,
+        quantity: 1, // Quantity is always 1 since price already includes the package
       },
     ],
     metadata,
@@ -115,16 +121,16 @@ export async function getCheckoutSession(
 
 /**
  * Get credits from a completed checkout session
- * Reads quantity from line_items (never trust metadata for credit count)
+ * Reads from metadata since each price is a fixed package (not quantity-based)
  */
 export function getCreditsFromSession(session: Stripe.Checkout.Session): number {
-  const lineItems = session.line_items?.data
-  if (!lineItems || lineItems.length === 0) {
-    throw new Error("No line items found in session")
+  const credits = session.metadata?.credits
+
+  if (!credits) {
+    throw new Error("No credits found in session metadata")
   }
 
-  // Sum all quantities (in case of multiple line items)
-  return lineItems.reduce((total, item) => total + (item.quantity || 0), 0)
+  return parseInt(credits, 10)
 }
 
 /**
