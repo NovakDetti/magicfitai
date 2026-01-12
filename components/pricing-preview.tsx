@@ -12,7 +12,7 @@ const plans = [
       "1 teljes AI sminkelemzés",
       "3 személyre szabott sminklook",
       "Részletes leírás és vizuális eredmény",
-      "Letölthető összefoglaló",
+      "Vizuális előnézet",
     ],
   },
   {

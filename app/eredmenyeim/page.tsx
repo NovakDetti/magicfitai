@@ -37,7 +37,6 @@ interface AnalysisSummary {
     skinTone: string
   } | null
   lookCount: number
-  pdfUrl: string | null
   createdAt: string
   completedAt: string | null
 }

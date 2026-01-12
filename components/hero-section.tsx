@@ -80,7 +80,7 @@ Irányadó sminktanácsadás, egyéni adottságokra építve.</span>
               <span className="h-3 w-px bg-border" />
               <span className="flex items-center gap-1.5">
                 <span className="h-1 w-1 rounded-full bg-primary/60" />
-                PDF összefoglaló
+                Vizuális előnézet
               </span>
               <span className="h-3 w-px bg-border" />
               <span className="flex items-center gap-1.5">

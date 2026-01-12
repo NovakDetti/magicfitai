@@ -120,7 +120,6 @@ export default function AISminkajanloPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null)
   const [analysisError, setAnalysisError] = useState<string | null>(null)
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
 
   // Payment/Auth Modal
   const [showPaymentModal, setShowPaymentModal] = useState(false)
@@ -331,7 +330,6 @@ export default function AISminkajanloPage() {
             observations: data.observations,
             looks: data.looks,
           })
-          setPdfUrl(data.pdfUrl)
           setCurrentStep(3)
           setIsAnalyzing(false)
           return
@@ -606,7 +604,6 @@ export default function AISminkajanloPage() {
                 observations={analysisResult.observations}
                 look={analysisResult.looks[0]}
                 beforeImageUrl={uploadedImage}
-                pdfUrl={pdfUrl}
                 isLoggedIn={!!session?.user}
                 onNewAnalysis={handleNewAnalysis}
               />

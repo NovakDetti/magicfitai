@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Download, FileDown, Image as ImageIcon, RefreshCw } from "lucide-react"
+import { Image as ImageIcon, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AIObservations } from "@/components/ai-observations"
 import { LooksView } from "@/components/looks-view"
@@ -13,7 +13,6 @@ interface AnalysisResultsProps {
   observations: AnalysisObservations
   looks: MakeupLook[]
   beforeImageUrl: string
-  pdfUrl?: string | null
   isPaid?: boolean
   userCredits?: number
   onCreditsChange?: (newBalance: number) => void
@@ -27,7 +26,6 @@ interface AnalysisResultsProps {
  * - AIObservations ("Mit látott az AI?") block
  * - LooksView with 3 looks (Nappali, Elegáns, Esti)
  * - BeforeAfterSlider within each look
- * - PDF download
  * - Image export
  * - Finomítás (refinement) upsell
  */
@@ -36,7 +34,6 @@ export function AnalysisResults({
   observations,
   looks,
   beforeImageUrl,
-  pdfUrl,
   isPaid = true,
   userCredits = 0,
   onCreditsChange,
@@ -107,12 +104,6 @@ export function AnalysisResults({
     }
   }
 
-  const handleDownloadPdf = () => {
-    // Use the dynamic PDF generation endpoint
-    const url = `/api/analysis/${sessionId}/pdf`
-    window.open(url, "_blank")
-  }
-
   const handleExportImages = async () => {
     try {
       const res = await fetch(`/api/analysis/${sessionId}/export`)
@@ -145,10 +136,6 @@ export function AnalysisResults({
           <Button variant="outline" size="sm" onClick={handleExportImages}>
             <ImageIcon className="mr-2 h-4 w-4" />
             Képek mentése
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleDownloadPdf}>
-            <FileDown className="mr-2 h-4 w-4" />
-            PDF letöltés
           </Button>
         </div>
       )}

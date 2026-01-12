@@ -24,7 +24,6 @@ interface SignatureLookResultsProps {
   observations: AnalysisObservations
   look: MakeupLook
   beforeImageUrl: string
-  pdfUrl?: string | null
   isLoggedIn?: boolean
   onNewAnalysis?: () => void
   skinAnalysis?: SkinConditionAnalysis | null
@@ -45,7 +44,6 @@ export function SignatureLookResults({
   observations,
   look,
   beforeImageUrl,
-  pdfUrl,
   isLoggedIn = false,
   onNewAnalysis,
   skinAnalysis,

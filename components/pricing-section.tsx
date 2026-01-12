@@ -6,14 +6,14 @@ const pricingTiers = [
   {
     title: "1 kredit",
     price: "450",
-    features: ["1 elemzés", "3 személyre szabott look", "PDF összefoglaló"],
+    features: ["1 elemzés", "3 személyre szabott look", "Vizuális előnézet"],
     cta: "Kérem",
     popular: false,
   },
   {
     title: "5 kredit",
     price: "2 025",
-    features: ["5 elemzés", "Részletes magyarázat", "Letölthető PDF"],
+    features: ["5 elemzés", "Részletes magyarázat", "Korlátlan elérés"],
     cta: "Ezt választom",
     popular: true,
   },

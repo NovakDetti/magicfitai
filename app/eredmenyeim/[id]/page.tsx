@@ -20,7 +20,6 @@ interface AnalysisData {
   observations: AnalysisObservations | null
   looks: MakeupLook[] | null
   afterImages: string[] | null
-  pdfUrl: string | null
   createdAt: string
   completedAt: string | null
   isOwned: boolean
@@ -225,7 +224,6 @@ export default function AnalysisDetailPage({
             observations={analysis.observations}
             look={primaryLook}
             beforeImageUrl={analysis.beforeImageUrl}
-            pdfUrl={analysis.pdfUrl}
             isLoggedIn={!!session?.user}
           />
         </div>

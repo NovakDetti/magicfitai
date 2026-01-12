@@ -5,13 +5,11 @@ import Image from "next/image"
 import {
   ChevronDown,
   ChevronUp,
-  Download,
   Eye,
   Sparkles,
   ShoppingBag,
   ListOrdered,
 } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { GlassCard } from "@/components/ui/glass-card"
 import { cn } from "@/lib/utils"
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
@@ -20,9 +18,6 @@ interface ResultsViewProps {
   observations: AnalysisObservations
   looks: MakeupLook[]
   beforeImageUrl?: string | null
-  pdfUrl?: string | null
-  isPaid?: boolean
-  onDownloadPdf?: () => void
   className?: string
 }
 
@@ -30,9 +25,6 @@ export function ResultsView({
   observations,
   looks,
   beforeImageUrl,
-  pdfUrl,
-  isPaid = true,
-  onDownloadPdf,
   className,
 }: ResultsViewProps) {
   const [expandedLooks, setExpandedLooks] = useState<Record<string, boolean>>({})
@@ -101,12 +93,6 @@ export function ResultsView({
             Személyre szabott look-ok
           </h2>
         </div>
-        {isPaid && pdfUrl && (
-          <Button variant="outline" size="sm" onClick={onDownloadPdf}>
-            <Download className="mr-2 h-4 w-4" />
-            PDF letöltés
-          </Button>
-        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">

@@ -18,7 +18,7 @@ export function PricingStep({ selectedPlan, onSelectPlan, onPurchase, onBack }: 
       name: "1 kredit",
       price: "450 Ft",
       description: "Egy teljes elemzés",
-      features: ["1 elemzés", "3 személyre szabott look", "PDF összefoglaló"],
+      features: ["1 elemzés", "3 személyre szabott look", "Vizuális előnézet"],
     },
     {
       id: "pack5",
@@ -29,7 +29,7 @@ export function PricingStep({ selectedPlan, onSelectPlan, onPurchase, onBack }: 
       features: [
         "5 elemzés",
         "Részletes magyarázat",
-        "Letölthető összefoglaló",
+        "Korlátlan elérés",
       ],
     },
     {

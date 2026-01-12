@@ -27,7 +27,6 @@ interface AnalysisData {
   observations: AnalysisObservations | null
   looks: MakeupLook[] | null
   afterImages: string[] | null
-  pdfUrl: string | null
   createdAt: string
   completedAt: string | null
   isOwned: boolean
@@ -48,14 +47,42 @@ export default function GuestResultPage({
   const [error, setError] = useState<string | null>(null)
   const [isClaiming, setIsClaiming] = useState(false)
   const [claimed, setClaimed] = useState(false)
+  const [didVerifyPayment, setDidVerifyPayment] = useState(false)
 
   const paymentSuccess = searchParams.get("payment") === "success"
+  const sessionId = searchParams.get("session_id")
 
   useEffect(() => {
     if (token) {
       fetchAnalysis()
     }
   }, [token])
+
+  // Verify payment if Stripe webhook is delayed
+  useEffect(() => {
+    if (!analysis || didVerifyPayment) return
+    if (!paymentSuccess || !sessionId) return
+    if (analysis.status !== "pending") return
+
+    const verify = async () => {
+      setDidVerifyPayment(true)
+      try {
+        const res = await fetch("/api/stripe/verify-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId, guestToken: token }),
+        })
+
+        if (res.ok) {
+          await fetchAnalysis()
+        }
+      } catch (err) {
+        console.error("Payment verification failed:", err)
+      }
+    }
+
+    verify()
+  }, [analysis, didVerifyPayment, paymentSuccess, sessionId, token])
 
   // Poll for status after payment or while processing
   useEffect(() => {
@@ -124,12 +151,6 @@ export default function GuestResultPage({
       setError(err instanceof Error ? err.message : "Ismeretlen hiba történt.")
     } finally {
       setIsClaiming(false)
-    }
-  }
-
-  const handleDownloadPdf = () => {
-    if (analysis?.pdfUrl) {
-      window.open(analysis.pdfUrl, "_blank")
     }
   }
 
@@ -308,9 +329,6 @@ export default function GuestResultPage({
               observations={analysis.observations}
               looks={analysis.looks}
               beforeImageUrl={analysis.beforeImageUrl}
-              pdfUrl={analysis.pdfUrl}
-              isPaid={true}
-              onDownloadPdf={handleDownloadPdf}
             />
           )}
         </div>

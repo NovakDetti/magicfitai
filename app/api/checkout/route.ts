@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     if (creditCount === 1 && guestToken) {
       // Single purchase as guest - redirect to result page
-      successUrl = `${baseUrl}/r/${guestToken}?payment=success`
+      successUrl = `${baseUrl}/r/${guestToken}?payment=success&session_id={CHECKOUT_SESSION_ID}`
       cancelUrl = `${baseUrl}/ai-sminkajanlo?payment=cancelled`
     } else if (userId) {
       // Logged in user - redirect to results

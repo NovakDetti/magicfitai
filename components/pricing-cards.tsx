@@ -27,7 +27,7 @@ const plans: PricingPlan[] = [
     features: [
       "1 teljes AI elemzés",
       "3 személyre szabott look",
-      "PDF letöltés",
+      "Vizuális előnézet",
       "7 napig elérhető",
     ],
     icon: <Sparkles className="h-5 w-5" />,
