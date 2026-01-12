@@ -59,7 +59,7 @@ Irányadó sminktanácsadás, egyéni adottságokra építve.</span>
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="hidden px-8 sm:inline-flex" asChild>
-                <Link href="#elozetes-utmutatas">
+                <Link href="#photo-tips">
                   <span className="relative z-10">Előzetes útmutatás</span>
                 </Link>
               </Button>
