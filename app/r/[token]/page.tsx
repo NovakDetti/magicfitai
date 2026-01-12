@@ -57,13 +57,19 @@ export default function GuestResultPage({
     }
   }, [token])
 
-  // Poll for status if processing
+  // Poll for status after payment or while processing
   useEffect(() => {
-    if (analysis?.status === "processing" || analysis?.status === "paid") {
+    if (!analysis) return
+    if (analysis.status === "complete" || analysis.status === "failed") return
+    if (
+      paymentSuccess ||
+      analysis.status === "processing" ||
+      analysis.status === "paid"
+    ) {
       const interval = setInterval(fetchAnalysis, 3000)
       return () => clearInterval(interval)
     }
-  }, [analysis?.status])
+  }, [analysis, paymentSuccess])
 
   const fetchAnalysis = async () => {
     try {
@@ -201,6 +207,20 @@ export default function GuestResultPage({
                   <p className="text-muted-foreground mb-6">
                     Sajnáljuk, hiba történt az elemzés során. Kérjük, lépj
                     kapcsolatba velünk a visszatérítésért.
+                  </p>
+                </>
+              ) : paymentSuccess ? (
+                <>
+                  <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">
+                    Fizetés feldolgozás alatt
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    A fizetés megerősítése folyamatban van. Ez általában néhány
+                    másodperc.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Az oldal automatikusan frissül...
                   </p>
                 </>
               ) : (
