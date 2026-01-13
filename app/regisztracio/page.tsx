@@ -9,9 +9,12 @@ import { Navigation } from "@/components/navigation"
 import { GlassCard } from "@/components/ui/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useLanguage } from "@/components/language-provider"
 
 export default function RegisztracioPage() {
   const router = useRouter()
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -25,7 +28,7 @@ export default function RegisztracioPage() {
     setError("")
 
     if (password !== confirmPassword) {
-      setError("A jelszavak nem egyeznek")
+      setError(t("A jelszavak nem egyeznek", "Passwords do not match"))
       return
     }
 
@@ -41,7 +44,7 @@ export default function RegisztracioPage() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error || "Hiba történt a regisztráció során")
+        setError(data.error || t("Hiba történt a regisztráció során", "Registration failed"))
         setIsLoading(false)
         return
       }
@@ -54,13 +57,13 @@ export default function RegisztracioPage() {
       })
 
       if (result?.error) {
-        setError("Sikeres regisztráció! Kérlek jelentkezz be.")
+        setError(t("Sikeres regisztráció! Kérlek jelentkezz be.", "Registration successful! Please sign in."))
         router.push("/bejelentkezes")
       } else {
         router.push("/eredmenyeim")
       }
     } catch {
-      setError("Hiba történt a regisztráció során")
+      setError(t("Hiba történt a regisztráció során", "Registration failed"))
     } finally {
       setIsLoading(false)
     }
@@ -83,10 +86,10 @@ export default function RegisztracioPage() {
               </span>
             </div>
             <h1 className="text-3xl font-light tracking-tight text-foreground">
-              Regisztráció
+              {t("Regisztráció", "Sign up")}
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Hozd létre fiókodat és mentsd el az elemzéseidet
+              {t("Hozd létre fiókodat és mentsd el az elemzéseidet", "Create your account and save your analyses")}
             </p>
           </div>
 
@@ -122,7 +125,7 @@ export default function RegisztracioPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Folytatás Google-lel
+              {t("Folytatás Google-lel", "Continue with Google")}
             </Button>
 
             <div className="relative my-6">
@@ -131,7 +134,7 @@ export default function RegisztracioPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  vagy email-lel
+                  {t("vagy email-lel", "or with email")}
                 </span>
               </div>
             </div>
@@ -142,7 +145,7 @@ export default function RegisztracioPage() {
                   htmlFor="name"
                   className="mb-2 block text-sm font-medium text-foreground"
                 >
-                  Teljes név
+                  {t("Teljes név", "Full name")}
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -150,7 +153,7 @@ export default function RegisztracioPage() {
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="Kiss Anna"
+                    placeholder={t("Kiss Anna", "Jane Doe")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
@@ -165,7 +168,7 @@ export default function RegisztracioPage() {
                   htmlFor="email"
                   className="mb-2 block text-sm font-medium text-foreground"
                 >
-                  Email cím
+                  {t("Email cím", "Email")}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -173,7 +176,7 @@ export default function RegisztracioPage() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="pelda@email.com"
+                    placeholder={t("pelda@email.com", "name@email.com")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -188,7 +191,7 @@ export default function RegisztracioPage() {
                   htmlFor="password"
                   className="mb-2 block text-sm font-medium text-foreground"
                 >
-                  Jelszó
+                  {t("Jelszó", "Password")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -196,7 +199,7 @@ export default function RegisztracioPage() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Legalább 6 karakter"
+                    placeholder={t("Legalább 6 karakter", "At least 6 characters")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -223,7 +226,7 @@ export default function RegisztracioPage() {
                   htmlFor="confirmPassword"
                   className="mb-2 block text-sm font-medium text-foreground"
                 >
-                  Jelszó megerősítése
+                  {t("Jelszó megerősítése", "Confirm password")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -231,7 +234,7 @@ export default function RegisztracioPage() {
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Jelszó újra"
+                    placeholder={t("Jelszó újra", "Repeat password")}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -250,33 +253,33 @@ export default function RegisztracioPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Regisztráció...
+                    {t("Regisztráció...", "Signing up...")}
                   </>
                 ) : (
-                  "Regisztráció"
+                  t("Regisztráció", "Sign up")
                 )}
               </Button>
             </form>
 
             <p className="mt-6 text-center text-xs text-muted-foreground">
-              A regisztrációval elfogadod az{" "}
+              {t("A regisztrációval elfogadod az", "By signing up, you accept the")}{" "}
               <Link
                 href="/adatvedelem"
                 className="text-primary hover:underline"
               >
-                Adatvédelmi Tájékoztatót
+                {t("Adatvédelmi Tájékoztatót", "Privacy Policy")}
               </Link>
               .
             </p>
           </GlassCard>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Már van fiókod?{" "}
+            {t("Már van fiókod?", "Already have an account?")}{" "}
             <Link
               href="/bejelentkezes"
               className="text-primary hover:underline"
             >
-              Jelentkezz be
+              {t("Jelentkezz be", "Sign in")}
             </Link>
           </p>
         </div>

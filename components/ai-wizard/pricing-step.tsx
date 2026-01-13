@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
+import { useLanguage } from "@/components/language-provider"
 
 interface PricingStepProps {
   selectedPlan: string | null
@@ -12,50 +13,96 @@ interface PricingStepProps {
 }
 
 export function PricingStep({ selectedPlan, onSelectPlan, onPurchase, onBack }: PricingStepProps) {
-  const plans = [
-    {
-      id: "single",
-      name: "1 kredit",
-      price: "450 Ft",
-      description: "Egy teljes elemzés",
-      features: ["1 elemzés", "3 személyre szabott look", "Vizuális előnézet"],
-    },
-    {
-      id: "pack5",
-      name: "5 kredit",
-      price: "2 025 Ft",
-      popular: true,
-      description: "Rugalmas több alkalomra",
-      features: [
-        "5 elemzés",
-        "Részletes magyarázat",
-        "Korlátlan elérés",
-      ],
-    },
-    {
-      id: "pack10",
-      name: "10 kredit",
-      price: "4 000 Ft",
-      description: "Legjobb ár/érték",
-      features: [
-        "10 elemzés",
-        "Korlátlan elérés",
-        "Prioritás támogatás",
-      ],
-    },
-  ]
+  const { language } = useLanguage()
+  const copy = language === "hu" ? {
+    title: "Válassza ki a krediteket",
+    subtitle: "Egyszeri szolgáltatás, további kötelezettség nélkül",
+    back: "Vissza",
+    continue: "Folytatás",
+    popular: "Leggyakrabban választott",
+    plans: [
+      {
+        id: "single",
+        name: "1 kredit",
+        price: "450 Ft",
+        description: "Egy teljes elemzés",
+        features: ["1 elemzés", "3 személyre szabott look", "Vizuális előnézet"],
+      },
+      {
+        id: "pack5",
+        name: "5 kredit",
+        price: "2 025 Ft",
+        popular: true,
+        description: "Rugalmas több alkalomra",
+        features: [
+          "5 elemzés",
+          "Részletes magyarázat",
+          "Korlátlan elérés",
+        ],
+      },
+      {
+        id: "pack10",
+        name: "10 kredit",
+        price: "4 000 Ft",
+        description: "Legjobb ár/érték",
+        features: [
+          "10 elemzés",
+          "Korlátlan elérés",
+          "Prioritás támogatás",
+        ],
+      },
+    ],
+  } : {
+    title: "Choose your credits",
+    subtitle: "One-time service with no ongoing commitment",
+    back: "Back",
+    continue: "Continue",
+    popular: "Most popular",
+    plans: [
+      {
+        id: "single",
+        name: "1 credit",
+        price: "450 Ft",
+        description: "One full analysis",
+        features: ["1 analysis", "3 personalized looks", "Visual preview"],
+      },
+      {
+        id: "pack5",
+        name: "5 credits",
+        price: "2 025 Ft",
+        popular: true,
+        description: "Flexible for multiple occasions",
+        features: [
+          "5 analyses",
+          "Detailed guidance",
+          "Unlimited access",
+        ],
+      },
+      {
+        id: "pack10",
+        name: "10 credits",
+        price: "4 000 Ft",
+        description: "Best price/value",
+        features: [
+          "10 analyses",
+          "Unlimited access",
+          "Priority support",
+        ],
+      },
+    ],
+  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-10">
       <div className="text-center">
         <h2 className="mb-3 text-2xl font-medium tracking-tight text-foreground md:text-3xl">
-          Válassza ki a krediteket
+          {copy.title}
         </h2>
-        <p className="text-muted-foreground">Egyszeri szolgáltatás, további kötelezettség nélkül</p>
+        <p className="text-muted-foreground">{copy.subtitle}</p>
       </div>
 
       <div className="stagger-children grid gap-6 md:grid-cols-3">
-        {plans.map((plan) => (
+        {copy.plans.map((plan) => (
           <Card
             key={plan.id}
             className={`glass-card cursor-pointer overflow-hidden rounded-[24px] border-0 transition-all duration-300 ${
@@ -67,7 +114,7 @@ export function PricingStep({ selectedPlan, onSelectPlan, onPurchase, onBack }: 
               {plan.popular && (
                 <div className="mb-4">
                   <span className="rounded-full bg-primary/10 px-4 py-1.5 text-xs font-medium tracking-wide text-primary">
-                    Leggyakrabban választott
+                    {copy.popular}
                   </span>
                 </div>
               )}
@@ -96,7 +143,7 @@ export function PricingStep({ selectedPlan, onSelectPlan, onPurchase, onBack }: 
           onClick={onBack}
           className="h-12 rounded-[12px] px-8 font-medium"
         >
-          Vissza
+          {copy.back}
         </Button>
         <Button
           size="lg"
@@ -104,7 +151,7 @@ export function PricingStep({ selectedPlan, onSelectPlan, onPurchase, onBack }: 
           disabled={!selectedPlan}
           className="h-12 rounded-[12px] px-8 font-medium"
         >
-          Folytatás
+          {copy.continue}
         </Button>
       </div>
     </div>

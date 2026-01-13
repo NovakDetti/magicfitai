@@ -5,31 +5,97 @@ import { Button } from "@/components/ui/button"
 import { Camera, Sun, Eye, Smile, CheckCircle2, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useLanguage } from "@/components/language-provider"
 
-const PHOTO_TIPS = [
-  {
-    icon: Sun,
-    title: "Természetes fény",
-    description: "Nappal, ablak közelében készítse a fényképet. Kerülje a közvetlen napfényt és a mesterséges lámpákat.",
-  },
-  {
-    icon: Eye,
-    title: "Szemből, egyenesen",
-    description: "Nézzen közvetlenül a kamerába, egyenes tartással. Frontális fotó szükséges az elemzéshez.",
-  },
-  {
-    icon: Smile,
-    title: "Smink nélkül",
-    description: "Tiszta, smink nélküli bőr a legpontosabb elemzéshez. Így láthatjuk a természetes vonásait.",
-  },
-  {
-    icon: CheckCircle2,
-    title: "Éles, jó minőség",
-    description: "HD felbontású, éles fotó. Kerülje a homályos vagy túl világos/sötét képeket.",
-  },
-]
+const PHOTO_TIPS = {
+  hu: [
+    {
+      icon: Sun,
+      title: "Természetes fény",
+      description:
+        "Nappal, ablak közelében készítse a fényképet. Kerülje a közvetlen napfényt és a mesterséges lámpákat.",
+    },
+    {
+      icon: Eye,
+      title: "Szemből, egyenesen",
+      description:
+        "Nézzen közvetlenül a kamerába, egyenes tartással. Frontális fotó szükséges az elemzéshez.",
+    },
+    {
+      icon: Smile,
+      title: "Smink nélkül",
+      description:
+        "Tiszta, smink nélküli bőr a legpontosabb elemzéshez. Így láthatjuk a természetes vonásait.",
+    },
+    {
+      icon: CheckCircle2,
+      title: "Éles, jó minőség",
+      description:
+        "HD felbontású, éles fotó. Kerülje a homályos vagy túl világos/sötét képeket.",
+    },
+  ],
+  en: [
+    {
+      icon: Sun,
+      title: "Natural light",
+      description:
+        "Take the photo in daylight near a window. Avoid direct sunlight and artificial lamps.",
+    },
+    {
+      icon: Eye,
+      title: "Straight-on",
+      description:
+        "Look directly into the camera with a straight posture. A frontal photo is required for analysis.",
+    },
+    {
+      icon: Smile,
+      title: "No makeup",
+      description:
+        "Clean, makeup-free skin gives the most accurate analysis and reveals natural features.",
+    },
+    {
+      icon: CheckCircle2,
+      title: "Sharp, high quality",
+      description:
+        "Use a sharp, HD photo. Avoid blurry or over/underexposed images.",
+    },
+  ],
+}
 
 export function PhotoTipsSection() {
+  const { language } = useLanguage()
+  const copy = language === "hu" ? {
+    badge: "Fénykép Megosztása",
+    titleTop: "Hogyan készítsen",
+    titleBottom: "tökéletes fotót?",
+    description:
+      "Néhány egyszerű tipp, hogy a legjobb eredményt érje el az AI elemzésből.",
+    imageAlt:
+      "Példa fotó - természetes fényben, egyenes tekintet, smink nélkül",
+    idealExample: "Ideális példa",
+    idealDescription:
+      "Ez a típusú fotó biztosítja a legpontosabb AI elemzést és személyre szabott ajánlásokat.",
+    ctaTitle: "Készen áll?",
+    ctaBody:
+      "Kezdje el az AI elemzést most, és kapjon személyre szabott sminkajánlást!",
+    ctaButton: "Fotó Feltöltése",
+  } : {
+    badge: "Photo Sharing",
+    titleTop: "How to take",
+    titleBottom: "the perfect photo?",
+    description:
+      "A few simple tips to get the best results from the AI analysis.",
+    imageAlt:
+      "Example photo - natural light, straight gaze, no makeup",
+    idealExample: "Ideal example",
+    idealDescription:
+      "This type of photo provides the most accurate AI analysis and personalized recommendations.",
+    ctaTitle: "Ready to start?",
+    ctaBody:
+      "Start the AI analysis now and get personalized makeup guidance!",
+    ctaButton: "Upload Photo",
+  }
+
   return (
     <section id="photo-tips" className="relative overflow-hidden bg-gradient-to-b from-secondary/20 to-background py-12 md:py-20 lg:py-28">
       {/* Decorative background elements */}
@@ -42,15 +108,15 @@ export function PhotoTipsSection() {
           <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2">
             <Camera className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium tracking-wide text-primary">
-              Fénykép Megosztása
+              {copy.badge}
             </span>
           </div>
           <h2 className="mb-4 text-2xl font-light tracking-tight text-foreground md:text-3xl lg:text-4xl xl:text-5xl">
-            Hogyan készítsen
-            <span className="block font-medium">tökéletes fotót?</span>
+            {copy.titleTop}
+            <span className="block font-medium">{copy.titleBottom}</span>
           </h2>
           <p className="mx-auto max-w-2xl text-base md:text-lg leading-relaxed text-muted-foreground">
-            Néhány egyszerű tipp, hogy a legjobb eredményt érje el az AI elemzésből.
+            {copy.description}
           </p>
         </div>
 
@@ -61,7 +127,7 @@ export function PhotoTipsSection() {
               <div className="relative aspect-[3/4] bg-gradient-to-br from-background to-secondary/20">
                 <Image
                   src="/selife.png"
-                  alt="Példa fotó - természetes fényben, egyenes tekintet, smink nélkül"
+                  alt={copy.imageAlt}
                   fill
                   className="object-cover"
                   priority
@@ -70,10 +136,10 @@ export function PhotoTipsSection() {
               <div className="space-y-3 p-6">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  <span className="text-sm font-medium text-foreground">Ideális példa</span>
+                  <span className="text-sm font-medium text-foreground">{copy.idealExample}</span>
                 </div>
                 <p className="text-sm leading-relaxed text-muted-foreground">
-                  Ez a típusú fotó biztosítja a legpontosabb AI elemzést és személyre szabott ajánlásokat.
+                  {copy.idealDescription}
                 </p>
               </div>
             </GlassCard>
@@ -81,7 +147,7 @@ export function PhotoTipsSection() {
 
           {/* Right side - Tips */}
           <div className="order-1 space-y-6 lg:order-2">
-            {PHOTO_TIPS.map((tip, index) => {
+            {PHOTO_TIPS[language].map((tip, index) => {
               const Icon = tip.icon
               return (
                 <GlassCard
@@ -94,9 +160,9 @@ export function PhotoTipsSection() {
                       <Icon className="h-6 w-6 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="mb-2 text-lg font-medium text-foreground">
-                        {tip.title}
-                      </h3>
+                    <h3 className="mb-2 text-lg font-medium text-foreground">
+                      {tip.title}
+                    </h3>
                       <p className="leading-relaxed text-muted-foreground">
                         {tip.description}
                       </p>
@@ -112,10 +178,10 @@ export function PhotoTipsSection() {
                 <div className="bg-gradient-to-br from-primary/10 to-primary/5 p-6">
                   <div className="mb-4 text-center">
                     <h3 className="mb-2 text-xl font-medium text-foreground">
-                      Készen áll?
+                      {copy.ctaTitle}
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Kezdje el az AI elemzést most, és kapjon személyre szabott sminkajánlást!
+                      {copy.ctaBody}
                     </p>
                   </div>
                   <Button
@@ -124,7 +190,7 @@ export function PhotoTipsSection() {
                     className="h-14 w-full rounded-[16px] text-base font-medium shadow-lg"
                   >
                     <Link href="/ai-sminkajanlo">
-                      Fotó Feltöltése
+                      {copy.ctaButton}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>

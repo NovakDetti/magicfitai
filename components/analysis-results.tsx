@@ -7,6 +7,7 @@ import { AIObservations } from "@/components/ai-observations"
 import { LooksView } from "@/components/looks-view"
 import { RefinementModal, type RefinementDirection } from "@/components/refinement-modal"
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
+import { useLanguage } from "@/components/language-provider"
 
 interface AnalysisResultsProps {
   sessionId: string
@@ -39,6 +40,8 @@ export function AnalysisResults({
   onCreditsChange,
   className,
 }: AnalysisResultsProps) {
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const [isRefinementOpen, setIsRefinementOpen] = React.useState(false)
   const [selectedLookId, setSelectedLookId] = React.useState<string | null>(null)
   const [selectedLookTitle, setSelectedLookTitle] = React.useState("")
@@ -135,7 +138,7 @@ export function AnalysisResults({
         <div className="mb-6 flex flex-wrap items-center justify-end gap-3">
           <Button variant="outline" size="sm" onClick={handleExportImages}>
             <ImageIcon className="mr-2 h-4 w-4" />
-            Képek mentése
+            {t("Képek mentése", "Save images")}
           </Button>
         </div>
       )}
@@ -156,7 +159,10 @@ export function AnalysisResults({
         <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <RefreshCw className="h-4 w-4" />
           <span>
-            Finomítás: 1 kredit/look • Egyenleged: {currentCredits} kredit
+            {t(
+              `Finomítás: 1 kredit/look • Egyenleged: ${currentCredits} kredit`,
+              `Refinement: 1 credit/look • Your balance: ${currentCredits} credits`
+            )}
           </span>
         </div>
       )}

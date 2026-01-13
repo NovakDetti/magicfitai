@@ -1,47 +1,109 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Check } from "lucide-react"
 import Link from "next/link"
-
-const plans = [
-  {
-    name: "📦 1 kredit",
-    price: "450 Ft",
-    description: "Egyszeri konzultáció",
-    features: [
-      "1 teljes AI sminkelemzés",
-      "3 személyre szabott sminklook",
-      "Részletes leírás és vizuális eredmény",
-      "Vizuális előnézet",
-    ],
-  },
-  {
-    name: "⭐ 5 kredit",
-    price: "2 025 Ft",
-    pricePerUnit: "(405 Ft / kredit)",
-    badge: "Leggyakrabban választott",
-    popular: true,
-    description: "Több alkalomra, kedvezőbb áron",
-    features: [
-      "5 teljes AI sminkelemzés",
-      "Ugyanaz a tartalom, mint az egyszeri konzultációnál",
-      "Rugalmas felhasználás, amikor szükséges",
-    ],
-  },
-  {
-    name: "💎 10 kredit",
-    price: "3 825 Ft",
-    pricePerUnit: "(382,50 Ft / kredit)",
-    description: "Legjobb ár / elemzés",
-    features: [
-      "10 teljes AI sminkelemzés",
-      "Azonos szolgáltatás, még kedvezőbb egységáron",
-      "Ideális rendszeres használatra",
-    ],
-  },
-]
+import { useLanguage } from "@/components/language-provider"
 
 export function PricingPreview() {
+  const { language } = useLanguage()
+  const copy = language === "hu" ? {
+    titleTop: "Konzultációs",
+    titleBottom: "lehetőségek",
+    description:
+      "Ugyanaz a szolgáltatás, kedvezőbb egységár több kredit vásárlásakor.",
+    trust:
+      "Minden konzultáció ugyanazt a részletes elemzést és sminkajánlást tartalmazza – a különbség kizárólag az egységárban van.",
+    faq: "Gyakori kérdések",
+    plans: [
+      {
+        name: "📦 1 kredit",
+        price: "450 Ft",
+        description: "Egyszeri konzultáció",
+        features: [
+          "1 teljes AI sminkelemzés",
+          "3 személyre szabott sminklook",
+          "Részletes leírás és vizuális eredmény",
+          "Vizuális előnézet",
+        ],
+      },
+      {
+        name: "⭐ 5 kredit",
+        price: "2 025 Ft",
+        pricePerUnit: "(405 Ft / kredit)",
+        badge: "Leggyakrabban választott",
+        popular: true,
+        description: "Több alkalomra, kedvezőbb áron",
+        features: [
+          "5 teljes AI sminkelemzés",
+          "Ugyanaz a tartalom, mint az egyszeri konzultációnál",
+          "Rugalmas felhasználás, amikor szükséges",
+        ],
+      },
+      {
+        name: "💎 10 kredit",
+        price: "3 825 Ft",
+        pricePerUnit: "(382,50 Ft / kredit)",
+        description: "Legjobb ár / elemzés",
+        features: [
+          "10 teljes AI sminkelemzés",
+          "Azonos szolgáltatás, még kedvezőbb egységáron",
+          "Ideális rendszeres használatra",
+        ],
+      },
+    ],
+    ctaPopular: "Ezt választom",
+    ctaDefault: "Konzultáció kérése",
+  } : {
+    titleTop: "Consultation",
+    titleBottom: "options",
+    description:
+      "Same service, better unit price when buying more credits.",
+    trust:
+      "Every consultation includes the same detailed analysis and makeup guidance — the only difference is the unit price.",
+    faq: "FAQ",
+    plans: [
+      {
+        name: "📦 1 credit",
+        price: "450 Ft",
+        description: "One-time consultation",
+        features: [
+          "1 full AI makeup analysis",
+          "3 personalized looks",
+          "Detailed description and visuals",
+          "Visual preview",
+        ],
+      },
+      {
+        name: "⭐ 5 credits",
+        price: "2 025 Ft",
+        pricePerUnit: "(405 Ft / credit)",
+        badge: "Most popular",
+        popular: true,
+        description: "For multiple occasions at a better price",
+        features: [
+          "5 full AI makeup analyses",
+          "Same content as the single consultation",
+          "Flexible use whenever you need it",
+        ],
+      },
+      {
+        name: "💎 10 credits",
+        price: "3 825 Ft",
+        pricePerUnit: "(382.50 Ft / credit)",
+        description: "Best price per analysis",
+        features: [
+          "10 full AI makeup analyses",
+          "Same service at a lower unit price",
+          "Ideal for regular use",
+        ],
+      },
+    ],
+    ctaPopular: "Choose this",
+    ctaDefault: "Request consultation",
+  }
+
   return (
     <section id="szolgaltatasok" className="relative overflow-hidden px-4 py-20 md:py-28">
       {/* Subtle background */}
@@ -50,16 +112,16 @@ export function PricingPreview() {
       <div className="container relative mx-auto max-w-6xl">
         <div className="mb-16 text-center">
           <h2 className="text-3xl font-light tracking-tight text-foreground md:text-4xl lg:text-5xl">
-            Konzultációs
-            <span className="block font-medium">lehetőségek</span>
+            {copy.titleTop}
+            <span className="block font-medium">{copy.titleBottom}</span>
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            Ugyanaz a szolgáltatás, kedvezőbb egységár több kredit vásárlásakor.
+            {copy.description}
           </p>
         </div>
 
         <div className="stagger-children grid gap-6 md:grid-cols-3 md:gap-8">
-          {plans.map((plan, index) => (
+          {copy.plans.map((plan, index) => (
             <Card
               key={index}
               className={`glass-card relative overflow-hidden rounded-[24px] border-0 ${
@@ -113,7 +175,7 @@ export function PricingPreview() {
                   asChild
                 >
                   <Link href="/ai-sminkajanlo">
-                    {plan.popular ? "Ezt választom" : "Konzultáció kérése"}
+                    {plan.popular ? copy.ctaPopular : copy.ctaDefault}
                   </Link>
                 </Button>
               </CardContent>
@@ -124,7 +186,7 @@ export function PricingPreview() {
         {/* Trust-building note */}
         <div className="mt-12 text-center">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Minden konzultáció ugyanazt a részletes elemzést és sminkajánlást tartalmazza – a különbség kizárólag az egységárban van.
+            {copy.trust}
           </p>
         </div>
 
@@ -134,7 +196,7 @@ export function PricingPreview() {
             className="text-muted-foreground hover:text-foreground"
             asChild
           >
-            <Link href="#kerdesek">Gyakori kérdések</Link>
+            <Link href="#kerdesek">{copy.faq}</Link>
           </Button>
         </div>
       </div>

@@ -13,6 +13,7 @@ import {
 import { GlassCard } from "@/components/ui/glass-card"
 import { cn } from "@/lib/utils"
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
+import { useLanguage } from "@/components/language-provider"
 
 interface ResultsViewProps {
   observations: AnalysisObservations
@@ -27,6 +28,8 @@ export function ResultsView({
   beforeImageUrl,
   className,
 }: ResultsViewProps) {
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const [expandedLooks, setExpandedLooks] = useState<Record<string, boolean>>({})
   const [showSteps, setShowSteps] = useState<Record<string, boolean>>({})
   const [showProducts, setShowProducts] = useState<Record<string, boolean>>({})
@@ -60,7 +63,7 @@ export function ResultsView({
             <Eye className="h-5 w-5 text-primary" />
           </div>
           <h2 className="text-xl font-medium text-foreground">
-            Mit vettünk észre a képen?
+            {t("Mit vettünk észre a képen?", "What did we notice in the photo?")}
           </h2>
         </div>
 
@@ -90,7 +93,7 @@ export function ResultsView({
             <Sparkles className="h-5 w-5 text-primary" />
           </div>
           <h2 className="text-xl font-medium text-foreground">
-            Személyre szabott look-ok
+            {t("Személyre szabott look-ok", "Personalized looks")}
           </h2>
         </div>
       </div>
@@ -109,8 +112,8 @@ export function ResultsView({
                   }
                   alt={
                     viewMode[look.id] === "after"
-                      ? `${look.title} - Utána`
-                      : "Előtte"
+                      ? `${look.title} - ${t("Utána", "After")}`
+                      : t("Előtte", "Before")
                   }
                   fill
                   className="object-cover"
@@ -135,7 +138,7 @@ export function ResultsView({
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >
-                      Előtte
+                      {t("Előtte", "Before")}
                     </button>
                     <button
                       onClick={() =>
@@ -151,7 +154,7 @@ export function ResultsView({
                           : "text-muted-foreground hover:text-foreground"
                       )}
                     >
-                      Utána
+                      {t("Utána", "After")}
                     </button>
                   </div>
                 </div>
@@ -161,7 +164,7 @@ export function ResultsView({
               {!look.afterImageUrl && (
                 <div className="absolute top-2 right-2">
                   <span className="rounded-full bg-secondary/80 px-2 py-1 text-xs text-muted-foreground backdrop-blur-sm">
-                    Előtte kép
+                    {t("Előtte kép", "Before image")}
                   </span>
                 </div>
               )}
@@ -188,7 +191,7 @@ export function ResultsView({
               >
                 <div className="flex items-center gap-2">
                   <ListOrdered className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Smink lépések</span>
+                  <span className="text-sm font-medium">{t("Smink lépések", "Makeup steps")}</span>
                 </div>
                 {showSteps[look.id] ? (
                   <ChevronUp className="h-4 w-4 text-muted-foreground" />
@@ -216,7 +219,7 @@ export function ResultsView({
               >
                 <div className="flex items-center gap-2">
                   <ShoppingBag className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Terméklista</span>
+                  <span className="text-sm font-medium">{t("Terméklista", "Product list")}</span>
                 </div>
                 {showProducts[look.id] ? (
                   <ChevronUp className="h-4 w-4 text-muted-foreground" />
@@ -232,14 +235,14 @@ export function ResultsView({
                         <div key={category}>
                           <p className="text-xs font-medium uppercase text-muted-foreground mb-1">
                             {category === "base"
-                              ? "Alap"
+                              ? t("Alap", "Base")
                               : category === "eyes"
-                              ? "Szemek"
+                              ? t("Szemek", "Eyes")
                               : category === "brows"
-                              ? "Szemöldök"
+                              ? t("Szemöldök", "Brows")
                               : category === "lips"
-                              ? "Ajkak"
-                              : "Arc"}
+                              ? t("Ajkak", "Lips")
+                              : t("Arc", "Face")}
                           </p>
                           <ul className="space-y-1">
                             {items.map((item, i) => (

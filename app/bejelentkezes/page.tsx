@@ -9,10 +9,13 @@ import { Navigation } from "@/components/navigation"
 import { GlassCard } from "@/components/ui/glass-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { useLanguage } from "@/components/language-provider"
 
 function BejelentkezesContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const callbackUrl = searchParams.get("callbackUrl") || "/eredmenyeim"
   const error = searchParams.get("error")
 
@@ -37,12 +40,12 @@ function BejelentkezesContent() {
       })
 
       if (result?.error) {
-        setFormError("Hibás email cím vagy jelszó")
+        setFormError(t("Hibás email cím vagy jelszó", "Invalid email or password"))
       } else {
         router.push(callbackUrl)
       }
     } catch {
-      setFormError("Hiba történt a bejelentkezés során")
+      setFormError(t("Hiba történt a bejelentkezés során", "An error occurred while signing in"))
     } finally {
       setIsLoading(false)
     }
@@ -56,13 +59,13 @@ function BejelentkezesContent() {
     switch (errorCode) {
       case "OAuthSignin":
       case "OAuthCallback":
-        return "Hiba történt a Google bejelentkezés során."
+        return t("Hiba történt a Google bejelentkezés során.", "Google sign-in failed.")
       case "OAuthAccountNotLinked":
-        return "Ez az email már egy másik fiókhoz van kapcsolva."
+        return t("Ez az email már egy másik fiókhoz van kapcsolva.", "This email is already linked to another account.")
       case "CredentialsSignin":
-        return "Hibás email cím vagy jelszó."
+        return t("Hibás email cím vagy jelszó.", "Invalid email or password.")
       default:
-        return errorCode ? "Ismeretlen hiba történt." : null
+        return errorCode ? t("Ismeretlen hiba történt.", "An unknown error occurred.") : null
     }
   }
 
@@ -81,10 +84,10 @@ function BejelentkezesContent() {
               </span>
             </div>
             <h1 className="text-3xl font-light tracking-tight text-foreground">
-              Bejelentkezés
+              {t("Bejelentkezés", "Sign in")}
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Jelentkezz be a korábbi elemzéseid megtekintéséhez
+              {t("Jelentkezz be a korábbi elemzéseid megtekintéséhez", "Sign in to view your previous analyses")}
             </p>
           </div>
 
@@ -122,7 +125,7 @@ function BejelentkezesContent() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Bejelentkezés Google-lel
+              {t("Bejelentkezés Google-lel", "Sign in with Google")}
             </Button>
 
             <div className="relative my-6">
@@ -131,7 +134,7 @@ function BejelentkezesContent() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  vagy email-lel
+                  {t("vagy email-lel", "or with email")}
                 </span>
               </div>
             </div>
@@ -142,7 +145,7 @@ function BejelentkezesContent() {
                   htmlFor="email"
                   className="mb-2 block text-sm font-medium text-foreground"
                 >
-                  Email cím
+                  {t("Email cím", "Email")}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -150,7 +153,7 @@ function BejelentkezesContent() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="pelda@email.com"
+                    placeholder={t("pelda@email.com", "name@email.com")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -165,7 +168,7 @@ function BejelentkezesContent() {
                   htmlFor="password"
                   className="mb-2 block text-sm font-medium text-foreground"
                 >
-                  Jelszó
+                  {t("Jelszó", "Password")}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -173,7 +176,7 @@ function BejelentkezesContent() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Jelszó"
+                    placeholder={t("Jelszó", "Password")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -202,43 +205,43 @@ function BejelentkezesContent() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Bejelentkezés...
+                    {t("Bejelentkezés...", "Signing in...")}
                   </>
                 ) : (
-                  "Bejelentkezés"
+                  t("Bejelentkezés", "Sign in")
                 )}
               </Button>
             </form>
 
             <p className="mt-6 text-center text-xs text-muted-foreground">
-              A bejelentkezéssel elfogadod az{" "}
+              {t("A bejelentkezéssel elfogadod az", "By signing in, you accept the")}{" "}
               <Link
                 href="/adatvedelem"
                 className="text-primary hover:underline"
               >
-                Adatvédelmi Tájékoztatót
+                {t("Adatvédelmi Tájékoztatót", "Privacy Policy")}
               </Link>
               .
             </p>
           </GlassCard>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Nincs még fiókod?{" "}
+            {t("Nincs még fiókod?", "Don't have an account?")}{" "}
             <Link
               href="/regisztracio"
               className="text-primary hover:underline"
             >
-              Regisztrálj most
+              {t("Regisztrálj most", "Sign up now")}
             </Link>
           </p>
 
           <p className="mt-3 text-center text-sm text-muted-foreground">
-            Nincs szükség regisztrációra az egyszeri elemzéshez.{" "}
+            {t("Nincs szükség regisztrációra az egyszeri elemzéshez.", "No registration needed for a one-time analysis.")}{" "}
             <Link
               href="/ai-sminkajanlo"
               className="text-primary hover:underline"
             >
-              Próbáld ki vendégként
+              {t("Próbáld ki vendégként", "Try as a guest")}
             </Link>
           </p>
         </div>

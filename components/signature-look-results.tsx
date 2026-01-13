@@ -18,6 +18,7 @@ import { BeforeAfterSlider } from "@/components/ui/before-after-slider"
 import { cn } from "@/lib/utils"
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
 import type { SkinConditionAnalysis } from "@/lib/gemini"
+import { useLanguage } from "@/components/language-provider"
 
 interface SignatureLookResultsProps {
   sessionId: string
@@ -49,6 +50,8 @@ export function SignatureLookResults({
   skinAnalysis,
   className,
 }: SignatureLookResultsProps) {
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const [showSteps, setShowSteps] = React.useState(false)
   const [showProducts, setShowProducts] = React.useState(false)
   const [showPrepTips, setShowPrepTips] = React.useState(false)
@@ -68,14 +71,17 @@ export function SignatureLookResults({
         <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#B78C86]/10 px-4 py-2">
           <Sparkles className="h-4 w-4 text-[#B78C86]" />
           <span className="text-sm font-medium text-[#B78C86]">
-            Eredmény
+            {t("Eredmény", "Result")}
           </span>
         </div>
         <h1 className="mb-3 text-3xl font-light tracking-tight text-foreground md:text-4xl">
-          Az Ön személyes smink-ajánlása
+          {t("Az Ön személyes smink-ajánlása", "Your personal makeup recommendation")}
         </h1>
         <p className="mx-auto max-w-xl text-base text-muted-foreground">
-          Egyetlen, kifejezetten Önre hangolt megjelenés — a fotó és a válaszok alapján.
+          {t(
+            "Egyetlen, kifejezetten Önre hangolt megjelenés — a fotó és a válaszok alapján.",
+            "A single look tailored to you — based on your photo and answers."
+          )}
         </p>
       </div>
 
@@ -87,8 +93,8 @@ export function SignatureLookResults({
             <BeforeAfterSlider
               beforeImage={beforeImageUrl}
               afterImage={look.afterImageUrl}
-              beforeLabel="Előtte"
-              afterLabel="Utána"
+              beforeLabel={t("Előtte", "Before")}
+              afterLabel={t("Utána", "After")}
               aspectRatio="portrait"
               className="shadow-2xl shadow-black/10"
             />
@@ -105,7 +111,7 @@ export function SignatureLookResults({
             <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-secondary/10 shadow-2xl shadow-black/10">
               <img
                 src={beforeImageUrl}
-                alt="Feltöltött fotó"
+                alt={t("Feltöltött fotó", "Uploaded photo")}
                 className="h-full w-full object-cover"
               />
               {/* Subtle overlay gradient */}
@@ -114,7 +120,7 @@ export function SignatureLookResults({
             {/* Label badge */}
             <div className="absolute -bottom-3 left-1/2 -translate-x-1/2">
               <span className="rounded-full bg-background/90 px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-lg backdrop-blur-sm">
-                Az Ön fotója
+                {t("Az Ön fotója", "Your photo")}
               </span>
             </div>
           </div>
@@ -124,7 +130,7 @@ export function SignatureLookResults({
         <div className="mt-8 flex justify-center gap-3">
           <Button variant="outline" size="sm" onClick={handleDownloadImage}>
             <Download className="mr-2 h-4 w-4" />
-            Kép letöltése
+            {t("Kép letöltése", "Download image")}
           </Button>
         </div>
       </div>
@@ -133,24 +139,24 @@ export function SignatureLookResults({
       <div className="mx-auto max-w-2xl">
         <GlassCard variant="subtle" className="p-6 md:p-8">
           <h2 className="mb-6 text-center text-lg font-medium text-foreground">
-            Mit vettünk észre
+            {t("Mit vettünk észre", "What we noticed")}
           </h2>
 
           <div className="grid grid-cols-2 gap-4 md:gap-6">
             <ObservationPoint
-              label="Arcforma"
+              label={t("Arcforma", "Face shape")}
               value={observations.faceShape}
             />
             <ObservationPoint
-              label="Bőrtónus / Altónus"
+              label={t("Bőrtónus / Altónus", "Skin tone / Undertone")}
               value={`${observations.skinTone}, ${observations.undertone}`}
             />
             <ObservationPoint
-              label="Kontraszt"
+              label={t("Kontraszt", "Contrast")}
               value={observations.contrast}
             />
             <ObservationPoint
-              label="Szemek / Szemöldök"
+              label={t("Szemek / Szemöldök", "Eyes / Brows")}
               value={`${observations.eyeShape}, ${observations.brows}`}
             />
           </div>
@@ -159,7 +165,7 @@ export function SignatureLookResults({
           <div className="mt-6 flex items-center justify-center gap-2 text-center">
             <Info className="h-3.5 w-3.5 text-muted-foreground/60" />
             <p className="text-xs text-muted-foreground/80">
-              Ez kozmetikai jellegű megfigyelés, nem orvosi értékelés.
+              {t("Ez kozmetikai jellegű megfigyelés, nem orvosi értékelés.", "This is a cosmetic observation, not a medical evaluation.")}
             </p>
           </div>
         </GlassCard>
@@ -174,47 +180,49 @@ export function SignatureLookResults({
               <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-[#B78C86]/10 px-3 py-1.5">
                 <Droplets className="h-4 w-4 text-[#B78C86]" />
                 <span className="text-xs font-medium text-[#B78C86]">
-                  Bőrelemzés
+                  {t("Bőrelemzés", "Skin analysis")}
                 </span>
               </div>
               <h2 className="mb-3 text-lg font-medium text-foreground">
-                Részletes bőrállapot-elemzés
+                {t("Részletes bőrállapot-elemzés", "Detailed skin condition analysis")}
               </h2>
               <p className="text-sm text-muted-foreground/90 leading-relaxed">
-                Az elemzés non-medical jellegű, kizárólag vizuális indikátorokon alapul.
-                Célja a smink eredményének optimalizálása és a bőrelőkészítés finomhangolása.
+                {t(
+                  "Az elemzés non-medical jellegű, kizárólag vizuális indikátorokon alapul. Célja a smink eredményének optimalizálása és a bőrelőkészítés finomhangolása.",
+                  "This analysis is non-medical and based solely on visual indicators. Its goal is to optimize the makeup result and refine skin preparation."
+                )}
               </p>
             </div>
 
             {/* Skin Indicators Grid */}
             <div className="mb-6 grid gap-4 sm:grid-cols-2">
               <SkinIndicator
-                label="Hidratáltság"
+                label={t("Hidratáltság", "Hydration")}
                 level={skinAnalysis.hydration.level}
                 description={skinAnalysis.hydration.description}
               />
               <SkinIndicator
-                label="Bőrfelszín egyenletessége"
+                label={t("Bőrfelszín egyenletessége", "Skin surface uniformity")}
                 level={skinAnalysis.texture.level}
                 description={skinAnalysis.texture.description}
               />
               <SkinIndicator
-                label="Pórusok láthatósága"
+                label={t("Pórusok láthatósága", "Pore visibility")}
                 level={skinAnalysis.pores.level}
                 description={skinAnalysis.pores.description}
               />
               <SkinIndicator
-                label="Faggyútermelés / fénylés"
+                label={t("Faggyútermelés / fénylés", "Oiliness / shine")}
                 level={skinAnalysis.oiliness.level}
                 description={skinAnalysis.oiliness.description}
               />
               <SkinIndicator
-                label="Pigmentáció és bőrtónus"
+                label={t("Pigmentáció és bőrtónus", "Pigmentation and skin tone")}
                 level={skinAnalysis.pigmentation.level}
                 description={skinAnalysis.pigmentation.description}
               />
               <SkinIndicator
-                label="Finom vonalak / ráncok"
+                label={t("Finom vonalak / ráncok", "Fine lines / wrinkles")}
                 level={skinAnalysis.fineLines.level}
                 description={skinAnalysis.fineLines.description}
               />
@@ -299,7 +307,7 @@ export function SignatureLookResults({
           {/* Why it works */}
           <div className="mb-8">
             <h4 className="mb-3 text-sm font-medium text-foreground">
-              Miért működik?
+              {t("Miért működik?", "Why it works")}
             </h4>
             <p className="text-sm leading-relaxed text-muted-foreground">
               {look.why}
@@ -317,7 +325,7 @@ export function SignatureLookResults({
             >
               <div className="flex items-center gap-3">
                 <ListOrdered className="h-5 w-5 text-[#B78C86]" />
-                <span className="font-medium text-foreground">Smink lépések</span>
+                <span className="font-medium text-foreground">{t("Smink lépések", "Makeup steps")}</span>
               </div>
               {showSteps ? (
                 <ChevronUp className="h-5 w-5 text-muted-foreground" />
@@ -348,7 +356,7 @@ export function SignatureLookResults({
             >
               <div className="flex items-center gap-3">
                 <ShoppingBag className="h-5 w-5 text-[#B78C86]" />
-                <span className="font-medium text-foreground">Terméktípusok</span>
+                <span className="font-medium text-foreground">{t("Terméktípusok", "Product types")}</span>
               </div>
               {showProducts ? (
                 <ChevronUp className="h-5 w-5 text-muted-foreground" />
@@ -360,11 +368,11 @@ export function SignatureLookResults({
             {showProducts && (
               <div className="rounded-xl bg-secondary/20 p-5">
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <ProductCategory title="Alap" items={look.products.base} />
-                  <ProductCategory title="Szem" items={look.products.eyes} />
-                  <ProductCategory title="Szemöldök" items={look.products.brows} />
-                  <ProductCategory title="Ajak" items={look.products.lips} />
-                  <ProductCategory title="Arc" items={look.products.face} />
+                  <ProductCategory title={t("Alap", "Base")} items={look.products.base} />
+                  <ProductCategory title={t("Szem", "Eyes")} items={look.products.eyes} />
+                  <ProductCategory title={t("Szemöldök", "Brows")} items={look.products.brows} />
+                  <ProductCategory title={t("Ajak", "Lips")} items={look.products.lips} />
+                  <ProductCategory title={t("Arc", "Face")} items={look.products.face} />
                 </div>
               </div>
             )}
@@ -377,17 +385,17 @@ export function SignatureLookResults({
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           {onNewAnalysis ? (
             <Button onClick={onNewAnalysis} className="w-full sm:w-auto">
-              Új elemzés
+              {t("Új elemzés", "New analysis")}
             </Button>
           ) : (
             <Link href="/ai-sminkajanlo">
-              <Button className="w-full sm:w-auto">Új elemzés</Button>
+              <Button className="w-full sm:w-auto">{t("Új elemzés", "New analysis")}</Button>
             </Link>
           )}
           {isLoggedIn && (
             <Link href="/eredmenyeim">
               <Button variant="outline" className="w-full sm:w-auto">
-                Összes elemzésem
+                {t("Összes elemzésem", "All my analyses")}
               </Button>
             </Link>
           )}
@@ -395,9 +403,9 @@ export function SignatureLookResults({
 
         {!isLoggedIn && (
           <p className="mt-4 text-sm text-muted-foreground">
-            Fiókkal az eredmények elmenthetők.{" "}
+            {t("Fiókkal az eredmények elmenthetők.", "With an account, results are saved.")}{" "}
             <Link href="/regisztracio" className="text-[#B78C86] hover:underline">
-              Regisztráció
+              {t("Regisztráció", "Sign up")}
             </Link>
           </p>
         )}

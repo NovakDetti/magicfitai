@@ -26,6 +26,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
+import { useLanguage } from "@/components/language-provider"
 
 interface AnalysisSummary {
   id: string
@@ -51,52 +52,52 @@ interface CreditsData {
   }>
 }
 
-const occasionLabels: Record<string, string> = {
-  everyday: "Hétköznapi",
-  work: "Munkahelyi",
-  evening: "Esti",
-  special: "Különleges alkalom",
-}
-
-const statusConfig: Record<
-  string,
-  { label: string; icon: React.ReactNode; color: string }
-> = {
-  pending: {
-    label: "Fizetésre vár",
-    icon: <Clock className="h-4 w-4" />,
-    color: "text-yellow-600",
-  },
-  paid: {
-    label: "Feldolgozás alatt",
-    icon: <Loader2 className="h-4 w-4 animate-spin" />,
-    color: "text-blue-600",
-  },
-  processing: {
-    label: "Feldolgozás alatt",
-    icon: <Loader2 className="h-4 w-4 animate-spin" />,
-    color: "text-blue-600",
-  },
-  complete: {
-    label: "Kész",
-    icon: <CheckCircle className="h-4 w-4" />,
-    color: "text-green-600",
-  },
-  failed: {
-    label: "Sikertelen",
-    icon: <AlertCircle className="h-4 w-4" />,
-    color: "text-red-600",
-  },
-  expired: {
-    label: "Lejárt",
-    icon: <Clock className="h-4 w-4" />,
-    color: "text-muted-foreground",
-  },
-}
-
 export default function EredmenyeimPage() {
   const { data: session, status: authStatus } = useSession()
   const router = useRouter()
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
+  const occasionLabels: Record<string, string> = {
+    everyday: t("Hétköznapi", "Everyday"),
+    work: t("Munkahelyi", "Work"),
+    evening: t("Esti", "Evening"),
+    special: t("Különleges alkalom", "Special event"),
+  }
+  const statusConfig: Record<
+    string,
+    { label: string; icon: React.ReactNode; color: string }
+  > = {
+    pending: {
+      label: t("Fizetésre vár", "Awaiting payment"),
+      icon: <Clock className="h-4 w-4" />,
+      color: "text-yellow-600",
+    },
+    paid: {
+      label: t("Feldolgozás alatt", "Processing"),
+      icon: <Loader2 className="h-4 w-4 animate-spin" />,
+      color: "text-blue-600",
+    },
+    processing: {
+      label: t("Feldolgozás alatt", "Processing"),
+      icon: <Loader2 className="h-4 w-4 animate-spin" />,
+      color: "text-blue-600",
+    },
+    complete: {
+      label: t("Kész", "Complete"),
+      icon: <CheckCircle className="h-4 w-4" />,
+      color: "text-green-600",
+    },
+    failed: {
+      label: t("Sikertelen", "Failed"),
+      icon: <AlertCircle className="h-4 w-4" />,
+      color: "text-red-600",
+    },
+    expired: {
+      label: t("Lejárt", "Expired"),
+      icon: <Clock className="h-4 w-4" />,
+      color: "text-muted-foreground",
+    },
+  }
   const [analyses, setAnalyses] = useState<AnalysisSummary[]>([])
   const [credits, setCredits] = useState<CreditsData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -153,17 +154,17 @@ export default function EredmenyeimPage() {
 
       const data = await res.json()
       if (!res.ok) {
-        throw new Error(data.error || "Nem sikerült elindítani a fizetést.")
+        throw new Error(data.error || t("Nem sikerült elindítani a fizetést.", "Failed to start payment."))
       }
 
       if (data.checkoutUrl) {
         window.location.href = data.checkoutUrl
       } else {
-        throw new Error("Hiányzó fizetési link.")
+        throw new Error(t("Hiányzó fizetési link.", "Missing payment link."))
       }
     } catch (error) {
       setPaymentError(
-        error instanceof Error ? error.message : "Ismeretlen hiba történt."
+        error instanceof Error ? error.message : t("Ismeretlen hiba történt.", "An unknown error occurred.")
       )
       setIsProcessingPayment(false)
     }
@@ -194,11 +195,11 @@ export default function EredmenyeimPage() {
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2">
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium text-primary">
-                Eredményeim
+                {t("Eredményeim", "My Results")}
               </span>
             </div>
             <h1 className="text-3xl font-light tracking-tight text-foreground md:text-4xl">
-              Korábbi elemzéseim
+              {t("Korábbi elemzéseim", "Past analyses")}
             </h1>
           </div>
 
@@ -211,10 +212,10 @@ export default function EredmenyeimPage() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">
-                    Rendelkezésre álló kredit
+                    {t("Rendelkezésre álló kredit", "Available credits")}
                   </p>
                   <p className="text-2xl font-bold text-foreground">
-                    {credits?.balance || 0} kredit
+                    {t(`${credits?.balance || 0} kredit`, `${credits?.balance || 0} credits`)}
                   </p>
                 </div>
               </div>
@@ -222,11 +223,11 @@ export default function EredmenyeimPage() {
                 <Link href="/ai-sminkajanlo">
                   <Button variant="outline">
                     <Plus className="mr-2 h-4 w-4" />
-                    Új elemzés
+                    {t("Új elemzés", "New analysis")}
                   </Button>
                 </Link>
                 <Button onClick={() => setShowCreditModal(true)}>
-                  Kredit vásárlás
+                  {t("Kredit vásárlás", "Buy credits")}
                 </Button>
               </div>
             </div>
@@ -237,13 +238,16 @@ export default function EredmenyeimPage() {
             <GlassCard className="text-center py-12">
               <Sparkles className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-medium text-foreground mb-2">
-                Még nincs elemzésed
+                {t("Még nincs elemzésed", "You don't have any analyses yet")}
               </h3>
               <p className="text-muted-foreground mb-6">
-                Készítsd el az első személyre szabott sminkelemzésedet!
+                {t(
+                  "Készítsd el az első személyre szabott sminkelemzésedet!",
+                  "Create your first personalized makeup analysis."
+                )}
               </p>
               <Link href="/ai-sminkajanlo">
-                <Button>Első elemzés indítása</Button>
+                <Button>{t("Első elemzés indítása", "Start your first analysis")}</Button>
               </Link>
             </GlassCard>
           ) : (
@@ -260,7 +264,7 @@ export default function EredmenyeimPage() {
                         {analysis.beforeImageUrl ? (
                           <Image
                             src={analysis.beforeImageUrl}
-                            alt="Elemzés kép"
+                            alt={t("Elemzés kép", "Analysis image")}
                             fill
                             className="object-cover"
                           />
@@ -290,7 +294,9 @@ export default function EredmenyeimPage() {
                           {occasionLabels[analysis.occasion] || analysis.occasion}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {new Date(analysis.createdAt).toLocaleDateString("hu-HU")}
+                          {new Date(analysis.createdAt).toLocaleDateString(
+                            language === "hu" ? "hu-HU" : "en-US"
+                          )}
                         </span>
                       </div>
 
@@ -303,7 +309,10 @@ export default function EredmenyeimPage() {
 
                       {analysis.lookCount > 0 && (
                         <p className="text-xs text-primary">
-                          {analysis.lookCount} look javaslat
+                          {t(
+                            `${analysis.lookCount} look javaslat`,
+                            `${analysis.lookCount} look suggestions`
+                          )}
                         </p>
                       )}
 
@@ -313,7 +322,7 @@ export default function EredmenyeimPage() {
                           <Link href={`/eredmenyeim/${analysis.id}`} className="flex-1">
                             <Button variant="outline" size="sm" className="w-full">
                               <Eye className="mr-1.5 h-3.5 w-3.5" />
-                              Megtekintés
+                              {t("Megtekintés", "View")}
                             </Button>
                           </Link>
                         </div>
@@ -331,10 +340,10 @@ export default function EredmenyeimPage() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-primary" />
-                Kredit vásárlás
+                {t("Kredit vásárlás", "Buy credits")}
               </DialogTitle>
               <DialogDescription>
-                Válassz csomagot a kreditek feltöltéséhez.
+                {t("Válassz csomagot a kreditek feltöltéséhez.", "Choose a package to add credits.")}
               </DialogDescription>
             </DialogHeader>
 
@@ -345,7 +354,7 @@ export default function EredmenyeimPage() {
                 className="flex w-full items-center justify-between rounded-[14px] border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-secondary/60 disabled:opacity-50"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">1 kredit</p>
+                  <p className="text-sm font-medium text-foreground">{t("1 kredit", "1 credit")}</p>
                   <p className="text-xs text-muted-foreground">450 Ft</p>
                 </div>
               </button>
@@ -355,7 +364,7 @@ export default function EredmenyeimPage() {
                 className="flex w-full items-center justify-between rounded-[14px] border border-border bg-background px-4 py-3 text-left transition-colors hover:bg-secondary/60 disabled:opacity-50"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">5 kredit</p>
+                  <p className="text-sm font-medium text-foreground">{t("5 kredit", "5 credits")}</p>
                   <p className="text-xs text-muted-foreground">2 025 Ft</p>
                 </div>
                 <span className="text-xs font-medium text-primary">-10%</span>
@@ -367,7 +376,7 @@ export default function EredmenyeimPage() {
                 className="flex w-full items-center justify-between rounded-[14px] border-2 border-primary bg-primary/5 px-4 py-3 text-left transition-colors hover:bg-primary/10 disabled:opacity-50"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">10 kredit</p>
+                  <p className="text-sm font-medium text-foreground">{t("10 kredit", "10 credits")}</p>
                   <p className="text-xs text-muted-foreground">3 825 Ft</p>
                 </div>
                 <span className="text-xs font-medium text-primary">-15%</span>
@@ -387,7 +396,7 @@ export default function EredmenyeimPage() {
                 onClick={() => setShowCreditModal(false)}
                 disabled={isProcessingPayment}
               >
-                Mégse
+                {t("Mégse", "Cancel")}
               </Button>
             </div>
           </DialogContent>

@@ -6,11 +6,35 @@ import { Menu, X, User, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import { useSession, signOut } from "next-auth/react"
+import { useLanguage } from "@/components/language-provider"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const { data: session } = useSession()
+  const { language, setLanguage } = useLanguage()
+
+  const copy = language === "hu" ? {
+    home: "Főoldal",
+    consultation: "AI Konzultáció",
+    results: "Eredményeim",
+    services: "Szolgáltatások",
+    register: "Regisztráció",
+    login: "Bejelentkezés",
+    logout: "Kijelentkezés",
+    requestConsultation: "Konzultáció kérése",
+    menuLabel: "Menü megnyitása",
+  } : {
+    home: "Home",
+    consultation: "AI Consultation",
+    results: "My Results",
+    services: "Services",
+    register: "Sign up",
+    login: "Sign in",
+    logout: "Sign out",
+    requestConsultation: "Request a consultation",
+    menuLabel: "Open menu",
+  }
 
   return (
     <nav className="fixed left-0 right-0 top-4 z-50 px-4">
@@ -34,7 +58,7 @@ export function Navigation() {
                     : "text-foreground/60 hover:bg-white/30 hover:text-foreground dark:hover:bg-white/10"
                 }`}
               >
-                Főoldal
+                {copy.home}
               </Link>
               <Link
                 href="/ai-sminkajanlo"
@@ -44,7 +68,7 @@ export function Navigation() {
                     : "text-foreground/60 hover:bg-white/30 hover:text-foreground dark:hover:bg-white/10"
                 }`}
               >
-                AI Konzultáció
+                {copy.consultation}
               </Link>
               {session && (
                 <Link
@@ -55,48 +79,70 @@ export function Navigation() {
                       : "text-foreground/60 hover:bg-white/30 hover:text-foreground dark:hover:bg-white/10"
                   }`}
                 >
-                  Eredményeim
+                  {copy.results}
                 </Link>
               )}
 
-              {session ? (
-                <div className="ml-3 flex items-center gap-2">
-                  <Link
-                    href="/profil"
-                    className="flex items-center gap-2 rounded-[12px] bg-white/20 px-3 py-1.5 transition-all duration-300 hover:bg-white/30"
-                  >
-                    <User className="h-4 w-4 text-foreground/70" />
-                    <span className="text-sm text-foreground/70">{session.user?.name || session.user?.email?.split('@')[0]}</span>
-                  </Link>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="rounded-[12px] px-3"
-                    onClick={() => signOut({ callbackUrl: '/' })}
-                  >
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="ml-3 flex items-center gap-2">
-                   <Button size="sm" variant="ghost" asChild>
-                    <Link href="/regisztracio">Regisztracio</Link>
-                  </Button>
-                  <Button size="sm" className="rounded-[12px] px-5" asChild>
-                    <Link href="/bejelentkezes">Bejelentkezes</Link>
-                  </Button>
-                </div>
-              )}
+              <div className="ml-3 flex items-center gap-2">
+                {session ? (
+                  <>
+                    <Link
+                      href="/profil"
+                      className="flex items-center gap-2 rounded-[12px] bg-white/20 px-3 py-1.5 transition-all duration-300 hover:bg-white/30"
+                    >
+                      <User className="h-4 w-4 text-foreground/70" />
+                      <span className="text-sm text-foreground/70">{session.user?.name || session.user?.email?.split("@")[0]}</span>
+                    </Link>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="rounded-[12px] px-3"
+                      onClick={() => signOut({ callbackUrl: "/" })}
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button size="sm" variant="ghost" asChild>
+                      <Link href="/regisztracio">{copy.register}</Link>
+                    </Button>
+                    <Button size="sm" className="rounded-[12px] px-5" asChild>
+                      <Link href="/bejelentkezes">{copy.login}</Link>
+                    </Button>
+                  </>
+                )}
+              </div>
+              <select
+                value={language}
+                onChange={(event) => setLanguage(event.target.value as "hu" | "en")}
+                aria-label="Language"
+                className="ml-3 rounded-[12px] border border-white/30 bg-transparent px-2 py-1.5 text-xs font-semibold tracking-wide text-foreground/80"
+              >
+                <option value="hu">HU</option>
+                <option value="en">EN</option>
+              </select>
             </div>
-
+ 
             {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="rounded-[14px] p-2.5 text-foreground transition-all duration-300 hover:bg-white/40 md:hidden"
-              aria-label="Menü megnyitása"
-            >
-              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+            <div className="flex items-center gap-2 md:hidden">
+              <select
+                value={language}
+                onChange={(event) => setLanguage(event.target.value as "hu" | "en")}
+                aria-label="Language"
+                className="rounded-[12px] border border-white/30 bg-transparent px-2 py-1.5 text-xs font-semibold tracking-wide text-foreground/80"
+              >
+                <option value="hu">HU</option>
+                <option value="en">EN</option>
+              </select>
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="rounded-[14px] p-2.5 text-foreground transition-all duration-300 hover:bg-white/40"
+                aria-label={copy.menuLabel}
+              >
+                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </button>
+            </div>
           </div>
 
           {/* Mobile Menu */}
@@ -108,14 +154,14 @@ export function Navigation() {
                   onClick={() => setIsOpen(false)}
                   className="rounded-[14px] px-4 py-3.5 text-sm font-medium tracking-wide text-foreground/70 transition-all duration-300 hover:bg-white/40 hover:text-foreground dark:hover:bg-white/10"
                 >
-                  Főoldal
+                  {copy.home}
                 </Link>
                 <Link
                   href="/ai-sminkajanlo"
                   onClick={() => setIsOpen(false)}
                   className="rounded-[14px] px-4 py-3.5 text-sm font-medium tracking-wide text-foreground/70 transition-all duration-300 hover:bg-white/40 hover:text-foreground dark:hover:bg-white/10"
                 >
-                  AI Konzultáció
+                  {copy.consultation}
                 </Link>
                 {session && (
                   <Link
@@ -123,7 +169,7 @@ export function Navigation() {
                     onClick={() => setIsOpen(false)}
                     className="rounded-[14px] px-4 py-3.5 text-sm font-medium tracking-wide text-foreground/70 transition-all duration-300 hover:bg-white/40 hover:text-foreground dark:hover:bg-white/10"
                   >
-                    Eredményeim
+                    {copy.results}
                   </Link>
                 )}
                 <Link
@@ -131,7 +177,7 @@ export function Navigation() {
                   onClick={() => setIsOpen(false)}
                   className="rounded-[14px] px-4 py-3.5 text-sm font-medium tracking-wide text-foreground/70 transition-all duration-300 hover:bg-white/40 hover:text-foreground dark:hover:bg-white/10"
                 >
-                  Szolgáltatások
+                  {copy.services}
                 </Link>
 
                 {session ? (
@@ -154,19 +200,19 @@ export function Navigation() {
                       }}
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      Kijelentkezés
+                      {copy.logout}
                     </Button>
                   </div>
                 ) : (
                   <div className="mt-3 flex flex-col gap-2">
                     <Button size="sm" variant="outline" className="w-full rounded-[12px]" asChild>
                       <Link href="/bejelentkezes" onClick={() => setIsOpen(false)}>
-                        Bejelentkezés
+                        {copy.login}
                       </Link>
                     </Button>
                     <Button size="sm" className="w-full rounded-[12px]" asChild>
                       <Link href="/ai-sminkajanlo" onClick={() => setIsOpen(false)}>
-                        Konzultáció kérése
+                        {copy.requestConsultation}
                       </Link>
                     </Button>
                   </div>

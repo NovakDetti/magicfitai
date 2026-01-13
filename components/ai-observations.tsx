@@ -4,6 +4,7 @@ import { Eye, Info } from "lucide-react"
 import { GlassCard } from "@/components/ui/glass-card"
 import { cn } from "@/lib/utils"
 import type { AnalysisObservations } from "@/lib/db/schema"
+import { useLanguage } from "@/components/language-provider"
 
 /**
  * Example JSON structure for observations:
@@ -25,16 +26,26 @@ interface AIObservationsProps {
   variant?: "default" | "compact"
 }
 
-// Observation field labels in Hungarian
-const OBSERVATION_LABELS: Record<keyof Omit<AnalysisObservations, "notes">, string> = {
-  faceShape: "Arcforma",
-  skinTone: "Bőrtónus",
-  undertone: "Altónus",
-  contrast: "Kontraszt",
-  eyeShape: "Szemek jellege",
-  brows: "Szemöldök",
-  lips: "Ajkak jellege",
-}
+const OBSERVATION_LABELS = {
+  hu: {
+    faceShape: "Arcforma",
+    skinTone: "Bőrtónus",
+    undertone: "Altónus",
+    contrast: "Kontraszt",
+    eyeShape: "Szemek jellege",
+    brows: "Szemöldök",
+    lips: "Ajkak jellege",
+  },
+  en: {
+    faceShape: "Face shape",
+    skinTone: "Skin tone",
+    undertone: "Undertone",
+    contrast: "Contrast",
+    eyeShape: "Eye shape",
+    brows: "Brows",
+    lips: "Lips",
+  },
+} as const
 
 // Icons for each observation type (optional visual enhancement)
 const OBSERVATION_ICONS: Record<keyof Omit<AnalysisObservations, "notes">, string> = {
@@ -52,7 +63,9 @@ export function AIObservations({
   className,
   variant = "default",
 }: AIObservationsProps) {
-  const fields = Object.entries(OBSERVATION_LABELS) as [
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
+  const fields = Object.entries(OBSERVATION_LABELS[language]) as [
     keyof Omit<AnalysisObservations, "notes">,
     string
   ][]
@@ -66,10 +79,10 @@ export function AIObservations({
         </div>
         <div>
           <h2 className="text-xl font-medium text-foreground">
-            Mit látott az AI?
+            {t("Mit látott az AI?", "What did the AI see?")}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Személyre szabott megfigyelések
+            {t("Személyre szabott megfigyelések", "Personalized observations")}
           </p>
         </div>
       </div>
@@ -112,9 +125,10 @@ export function AIObservations({
       <div className="mt-6 flex items-start gap-2 rounded-xl bg-secondary/20 p-4">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
         <p className="text-xs text-muted-foreground">
-          Ez egy kozmetikai jellegű megfigyelés, nem orvosi értékelés.
-          Az AI által meghatározott jellemzők csak tájékoztató jellegűek,
-          és a személyre szabott sminkjavaslatok alapjául szolgálnak.
+          {t(
+            "Ez egy kozmetikai jellegű megfigyelés, nem orvosi értékelés. Az AI által meghatározott jellemzők csak tájékoztató jellegűek, és a személyre szabott sminkjavaslatok alapjául szolgálnak.",
+            "This is a cosmetic observation, not a medical evaluation. AI-detected characteristics are informational and form the basis of personalized makeup recommendations."
+          )}
         </p>
       </div>
     </GlassCard>

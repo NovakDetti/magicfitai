@@ -17,6 +17,7 @@ import { GlassCard } from "@/components/ui/glass-card"
 import { Button } from "@/components/ui/button"
 import { ResultsView } from "@/components/results-view"
 import type { AnalysisObservations, MakeupLook, AnalysisToggles } from "@/lib/db/schema"
+import { useLanguage } from "@/components/language-provider"
 
 interface AnalysisData {
   id: string
@@ -42,6 +43,8 @@ export default function GuestResultPage({
   const { data: session, status: authStatus } = useSession()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -104,17 +107,17 @@ export default function GuestResultPage({
       const res = await fetch(`/api/analysis/by-token/${token}`)
       if (!res.ok) {
         const data = await res.json()
-        if (data.expired) {
-          setError("Ez az elemzés lejárt. A vendég eredmények 7 napig érhetők el.")
-        } else {
-          throw new Error(data.error || "Nem sikerült betölteni az elemzést.")
-        }
+          if (data.expired) {
+            setError(t("Ez az elemzés lejárt. A vendég eredmények 7 napig érhetők el.", "This analysis has expired. Guest results are available for 7 days."))
+          } else {
+            throw new Error(data.error || t("Nem sikerült betölteni az elemzést.", "Failed to load the analysis."))
+          }
         return
       }
       const data = await res.json()
       setAnalysis(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba történt.")
+      setError(err instanceof Error ? err.message : t("Ismeretlen hiba történt.", "An unknown error occurred."))
     } finally {
       setIsLoading(false)
     }
@@ -137,7 +140,7 @@ export default function GuestResultPage({
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || "Nem sikerült menteni az elemzést.")
+        throw new Error(data.error || t("Nem sikerült menteni az elemzést.", "Failed to save the analysis."))
       }
 
       const data = await res.json()
@@ -148,7 +151,7 @@ export default function GuestResultPage({
         router.push(`/eredmenyeim/${data.analysisId}`)
       }, 2000)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ismeretlen hiba történt.")
+      setError(err instanceof Error ? err.message : t("Ismeretlen hiba történt.", "An unknown error occurred."))
     } finally {
       setIsClaiming(false)
     }
@@ -178,11 +181,13 @@ export default function GuestResultPage({
             <GlassCard className="text-center py-12">
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-destructive" />
               <h3 className="text-lg font-medium text-foreground mb-2">
-                {error.includes("lejárt") ? "Lejárt elemzés" : "Hiba történt"}
+                {error.includes("lejárt")
+                  ? t("Lejárt elemzés", "Expired analysis")
+                  : t("Hiba történt", "An error occurred")}
               </h3>
               <p className="text-muted-foreground mb-6">{error}</p>
               <Link href="/ai-sminkajanlo">
-                <Button>Új elemzés készítése</Button>
+                <Button>{t("Új elemzés készítése", "Create new analysis")}</Button>
               </Link>
             </GlassCard>
           </div>
@@ -208,50 +213,56 @@ export default function GuestResultPage({
                   <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
                     {paymentSuccess
-                      ? "Köszönjük a vásárlást!"
-                      : "Elemzés folyamatban"}
+                      ? t("Köszönjük a vásárlást!", "Thanks for your purchase!")
+                      : t("Elemzés folyamatban", "Analysis in progress")}
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Az AI éppen dolgozik a személyre szabott javaslataidon. Ez
-                    általában 1-2 percig tart.
+                    {t(
+                      "Az AI éppen dolgozik a személyre szabott javaslataidon. Ez általában 1-2 percig tart.",
+                      "The AI is working on your personalized recommendations. This usually takes 1–2 minutes."
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Az oldal automatikusan frissül...
+                    {t("Az oldal automatikusan frissül...", "The page refreshes automatically...")}
                   </p>
                 </>
               ) : analysis.status === "failed" ? (
                 <>
                   <AlertCircle className="mx-auto mb-4 h-12 w-12 text-destructive" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Az elemzés sikertelen volt
+                    {t("Az elemzés sikertelen volt", "The analysis failed")}
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Sajnáljuk, hiba történt az elemzés során. Kérjük, lépj
-                    kapcsolatba velünk a visszatérítésért.
+                    {t(
+                      "Sajnáljuk, hiba történt az elemzés során. Kérjük, lépj kapcsolatba velünk a visszatérítésért.",
+                      "Sorry, something went wrong. Please contact us for a refund."
+                    )}
                   </p>
                 </>
               ) : paymentSuccess ? (
                 <>
                   <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Fizetés feldolgozás alatt
+                    {t("Fizetés feldolgozás alatt", "Payment processing")}
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    A fizetés megerősítése folyamatban van. Ez általában néhány
-                    másodperc.
+                    {t(
+                      "A fizetés megerősítése folyamatban van. Ez általában néhány másodperc.",
+                      "Payment confirmation is in progress. This usually takes a few seconds."
+                    )}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Az oldal automatikusan frissül...
+                    {t("Az oldal automatikusan frissül...", "The page refreshes automatically...")}
                   </p>
                 </>
               ) : (
                 <>
                   <Clock className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Fizetésre vár
+                    {t("Fizetésre vár", "Awaiting payment")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Ez az elemzés még nincs kifizetve.
+                    {t("Ez az elemzés még nincs kifizetve.", "This analysis hasn't been paid yet.")}
                   </p>
                 </>
               )}
@@ -279,12 +290,12 @@ export default function GuestResultPage({
                 </div>
                 <div>
                   <h3 className="font-medium text-foreground">
-                    Mentsd el fiókba
+                    {t("Mentsd el fiókba", "Save to account")}
                   </h3>
                   <p className="text-sm text-muted-foreground">
                     {session?.user
-                      ? "Az elemzés 7 nap után törlődik. Mentsd el a fiókodba!"
-                      : "Jelentkezz be, hogy ne veszítsd el az elemzésedet!"}
+                      ? t("Az elemzés 7 nap után törlődik. Mentsd el a fiókodba!", "The analysis is deleted after 7 days. Save it to your account!")
+                      : t("Jelentkezz be, hogy ne veszítsd el az elemzésedet!", "Sign in so you don't lose your analysis!")}
                   </p>
                 </div>
               </div>
@@ -292,15 +303,15 @@ export default function GuestResultPage({
                 {isClaiming ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Mentés...
+                    {t("Mentés...", "Saving...")}
                   </>
                 ) : session?.user ? (
                   <>
                     <Save className="mr-2 h-4 w-4" />
-                    Mentés fiókba
+                    {t("Mentés fiókba", "Save to account")}
                   </>
                 ) : (
-                  "Bejelentkezés és mentés"
+                  t("Bejelentkezés és mentés", "Sign in and save")
                 )}
               </Button>
             </GlassCard>
@@ -315,10 +326,10 @@ export default function GuestResultPage({
               <CheckCircle className="h-5 w-5 text-green-600" />
               <div>
                 <p className="font-medium text-foreground">
-                  Sikeresen elmentve!
+                  {t("Sikeresen elmentve!", "Saved successfully!")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Átirányítunk az elemzéseidhez...
+                  {t("Átirányítunk az elemzéseidhez...", "Redirecting to your analyses...")}
                 </p>
               </div>
             </GlassCard>

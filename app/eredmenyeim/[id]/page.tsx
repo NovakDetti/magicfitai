@@ -10,6 +10,7 @@ import { GlassCard } from "@/components/ui/glass-card"
 import { Button } from "@/components/ui/button"
 import { SignatureLookResults } from "@/components/signature-look-results"
 import type { AnalysisObservations, MakeupLook, AnalysisToggles } from "@/lib/db/schema"
+import { useLanguage } from "@/components/language-provider"
 
 interface AnalysisData {
   id: string
@@ -33,6 +34,8 @@ export default function AnalysisDetailPage({
   const { id } = use(params)
   const { data: session, status: authStatus } = useSession()
   const router = useRouter()
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -91,13 +94,13 @@ export default function AnalysisDetailPage({
             <GlassCard className="text-center py-12">
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-destructive" />
               <h3 className="text-lg font-medium text-foreground mb-2">
-                Hiba történt
+                {t("Hiba történt", "An error occurred")}
               </h3>
               <p className="text-muted-foreground mb-6">{error}</p>
               <Link href="/eredmenyeim">
                 <Button variant="outline">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Vissza az elemzésekhez
+                  {t("Vissza az elemzésekhez", "Back to analyses")}
                 </Button>
               </Link>
             </GlassCard>
@@ -124,7 +127,7 @@ export default function AnalysisDetailPage({
                 className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Vissza az elemzésekhez
+                {t("Vissza az elemzésekhez", "Back to analyses")}
               </Link>
             </div>
 
@@ -133,35 +136,39 @@ export default function AnalysisDetailPage({
                 <>
                   <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-[#B78C86]" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Elemzés folyamatban
+                    {t("Elemzés folyamatban", "Analysis in progress")}
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Az AI éppen dolgozik a személyre szabott javaslataidon. Ez
-                    általában 1-2 percig tart.
+                    {t(
+                      "Az AI éppen dolgozik a személyre szabott javaslataidon. Ez általában 1-2 percig tart.",
+                      "The AI is working on your personalized recommendations. This usually takes 1–2 minutes."
+                    )}
                   </p>
                   <Button onClick={fetchAnalysis} variant="outline">
-                    Frissítés
+                    {t("Frissítés", "Refresh")}
                   </Button>
                 </>
               ) : analysis.status === "failed" ? (
                 <>
                   <AlertCircle className="mx-auto mb-4 h-12 w-12 text-destructive" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Az elemzés sikertelen volt
+                    {t("Az elemzés sikertelen volt", "The analysis failed")}
                   </h3>
                   <p className="text-muted-foreground mb-6">
-                    Sajnáljuk, hiba történt az elemzés során. Kérjük, próbáld
-                    újra vagy lépj kapcsolatba velünk.
+                    {t(
+                      "Sajnáljuk, hiba történt az elemzés során. Kérjük, próbáld újra vagy lépj kapcsolatba velünk.",
+                      "Sorry, something went wrong during the analysis. Please try again or contact us."
+                    )}
                   </p>
                 </>
               ) : (
                 <>
                   <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
                   <h3 className="text-lg font-medium text-foreground mb-2">
-                    Elemzés várakozik
+                    {t("Elemzés várakozik", "Analysis pending")}
                   </h3>
                   <p className="text-muted-foreground">
-                    Ez az elemzés még nincs feldolgozva.
+                    {t("Ez az elemzés még nincs feldolgozva.", "This analysis hasn't been processed yet.")}
                   </p>
                 </>
               )}
@@ -184,15 +191,15 @@ export default function AnalysisDetailPage({
             <GlassCard className="text-center py-12">
               <AlertCircle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
               <h3 className="text-lg font-medium text-foreground mb-2">
-                Hiányos adatok
+                {t("Hiányos adatok", "Incomplete data")}
               </h3>
               <p className="text-muted-foreground mb-6">
-                Az elemzés adatai hiányosak.
+                {t("Az elemzés adatai hiányosak.", "The analysis data is incomplete.")}
               </p>
               <Link href="/eredmenyeim">
                 <Button variant="outline">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Vissza az elemzésekhez
+                  {t("Vissza az elemzésekhez", "Back to analyses")}
                 </Button>
               </Link>
             </GlassCard>
@@ -214,7 +221,7 @@ export default function AnalysisDetailPage({
               className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Vissza az elemzésekhez
+              {t("Vissza az elemzésekhez", "Back to analyses")}
             </Link>
           </div>
 

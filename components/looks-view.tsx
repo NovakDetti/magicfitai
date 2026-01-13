@@ -17,6 +17,7 @@ import { BeforeAfterSlider } from "@/components/ui/before-after-slider"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type { MakeupLook } from "@/lib/db/schema"
+import { useLanguage } from "@/components/language-provider"
 
 /**
  * Example data structure for looks:
@@ -47,29 +48,7 @@ import type { MakeupLook } from "@/lib/db/schema"
  * ]
  */
 
-// Look type configuration with icons and colors
-const LOOK_CONFIG = {
-  nappali: {
-    icon: Sun,
-    label: "Nappali",
-    description: "Friss, természetes megjelenés",
-    color: "bg-amber-500/10 text-amber-600",
-  },
-  elegans: {
-    icon: Sparkles,
-    label: "Elegáns",
-    description: "Kifinomult, profi megjelenés",
-    color: "bg-primary/10 text-primary",
-  },
-  esti: {
-    icon: Moon,
-    label: "Alkalmi / Esti",
-    description: "Különleges alkalmakra",
-    color: "bg-purple-500/10 text-purple-600",
-  },
-} as const
-
-type LookType = keyof typeof LOOK_CONFIG
+type LookType = "nappali" | "elegans" | "esti"
 
 interface LooksViewProps {
   looks: MakeupLook[]
@@ -86,6 +65,49 @@ export function LooksView({
   onRefineLook,
   canRefine = false,
 }: LooksViewProps) {
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
+  const lookConfig = language === "hu"
+    ? {
+        nappali: {
+          icon: Sun,
+          label: "Nappali",
+          description: "Friss, természetes megjelenés",
+          color: "bg-amber-500/10 text-amber-600",
+        },
+        elegans: {
+          icon: Sparkles,
+          label: "Elegáns",
+          description: "Kifinomult, profi megjelenés",
+          color: "bg-primary/10 text-primary",
+        },
+        esti: {
+          icon: Moon,
+          label: "Alkalmi / Esti",
+          description: "Különleges alkalmakra",
+          color: "bg-purple-500/10 text-purple-600",
+        },
+      }
+    : {
+        nappali: {
+          icon: Sun,
+          label: "Daytime",
+          description: "Fresh, natural look",
+          color: "bg-amber-500/10 text-amber-600",
+        },
+        elegans: {
+          icon: Sparkles,
+          label: "Elegant",
+          description: "Refined, professional look",
+          color: "bg-primary/10 text-primary",
+        },
+        esti: {
+          icon: Moon,
+          label: "Evening",
+          description: "For special occasions",
+          color: "bg-purple-500/10 text-purple-600",
+        },
+      }
   const [activeTab, setActiveTab] = React.useState(0)
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({})
 
@@ -102,7 +124,7 @@ export function LooksView({
 
   const activeLook = looks[activeTab]
   const lookType = getLookType(activeTab)
-  const config = LOOK_CONFIG[lookType]
+  const config = lookConfig[lookType]
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -113,10 +135,10 @@ export function LooksView({
         </div>
         <div>
           <h2 className="text-xl font-medium text-foreground">
-            Személyre szabott look-ok
+            {t("Személyre szabott look-ok", "Personalized looks")}
           </h2>
           <p className="text-sm text-muted-foreground">
-            3 egyedi javaslat különböző alkalmakra
+            {t("3 egyedi javaslat különböző alkalmakra", "3 unique suggestions for different occasions")}
           </p>
         </div>
       </div>
@@ -125,7 +147,7 @@ export function LooksView({
       <div className="flex gap-2 overflow-x-auto pb-2">
         {looks.map((look, index) => {
           const type = getLookType(index)
-          const cfg = LOOK_CONFIG[type]
+          const cfg = lookConfig[type]
           const Icon = cfg.icon
           const isActive = index === activeTab
 
@@ -167,7 +189,7 @@ export function LooksView({
                 className="shrink-0"
               >
                 <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-                Finomítás
+                {t("Finomítás", "Refine")}
               </Button>
             )}
           </div>
@@ -184,7 +206,7 @@ export function LooksView({
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-secondary/30">
                 <Image
                   src={beforeImageUrl}
-                  alt="Eredeti kép"
+                  alt={t("Eredeti kép", "Original image")}
                   fill
                   className="object-cover"
                 />
@@ -192,7 +214,7 @@ export function LooksView({
                   <div className="text-center">
                     <Sparkles className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">
-                      AI kép generálás folyamatban...
+                      {t("AI kép generálás folyamatban...", "AI image generation in progress...")}
                     </p>
                   </div>
                 </div>
@@ -220,7 +242,10 @@ export function LooksView({
                 <div>
                   <span className="font-medium text-foreground">Smink lépések</span>
                   <p className="text-xs text-muted-foreground">
-                    {activeLook.steps.length} lépés a tökéletes megjelenéshez
+                    {t(
+                      `${activeLook.steps.length} lépés a tökéletes megjelenéshez`,
+                      `${activeLook.steps.length} steps to the perfect look`
+                    )}
                   </p>
                 </div>
               </div>
@@ -258,7 +283,7 @@ export function LooksView({
                 <div>
                   <span className="font-medium text-foreground">Szükséges termékek</span>
                   <p className="text-xs text-muted-foreground">
-                    Terméktípusok kategóriánként
+                    {t("Terméktípusok kategóriánként", "Product types by category")}
                   </p>
                 </div>
               </div>
@@ -273,23 +298,23 @@ export function LooksView({
               <div className="rounded-xl bg-secondary/20 p-4 ml-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <ProductCategory
-                    title="Alap"
+                    title={t("Alap", "Base")}
                     items={activeLook.products.base}
                   />
                   <ProductCategory
-                    title="Szemek"
+                    title={t("Szemek", "Eyes")}
                     items={activeLook.products.eyes}
                   />
                   <ProductCategory
-                    title="Szemöldök"
+                    title={t("Szemöldök", "Brows")}
                     items={activeLook.products.brows}
                   />
                   <ProductCategory
-                    title="Ajkak"
+                    title={t("Ajkak", "Lips")}
                     items={activeLook.products.lips}
                   />
                   <ProductCategory
-                    title="Arc"
+                    title={t("Arc", "Face")}
                     items={activeLook.products.face}
                   />
                 </div>
@@ -303,7 +328,7 @@ export function LooksView({
       <div className="grid grid-cols-3 gap-2 md:hidden">
         {looks.map((look, index) => {
           const type = getLookType(index)
-          const cfg = LOOK_CONFIG[type]
+          const cfg = lookConfig[type]
           const Icon = cfg.icon
           const isActive = index === activeTab
 

@@ -33,6 +33,7 @@ import {
   Check,
 } from "lucide-react"
 import type { AnalysisObservations, MakeupLook } from "@/lib/db/schema"
+import { useLanguage } from "@/components/language-provider"
 
 // ============================================
 // Types
@@ -46,55 +47,53 @@ interface AnalysisResult {
 type WizardStep = 1 | 2 | 3
 
 // ============================================
-// Constants
-// ============================================
-
-const WIZARD_STEPS: Step[] = [
-  { id: 1, title: "Fotó" },
-  { id: 2, title: "Részletek" },
-  { id: 3, title: "Eredmények" },
-]
-
-const MAKEUP_STYLES = [
-  {
-    value: "everyday",
-    label: "Hétköznapi",
-    description: "Természetes, fresh look minden napra",
-    icon: "☀️"
-  },
-  {
-    value: "date",
-    label: "Randi",
-    description: "Romantikus, lágy smink különleges pillanatokra",
-    icon: "💕"
-  },
-  {
-    value: "party",
-    label: "Buli",
-    description: "Merész, csillogó smink bulizáshoz",
-    icon: "🎉"
-  },
-  {
-    value: "smokey",
-    label: "Smokey",
-    description: "Intenzív, drámai szemsmink",
-    icon: "🌙"
-  },
-  {
-    value: "elegant",
-    label: "Elegáns",
-    description: "Kifinomult, elegáns megjelenés",
-    icon: "✨"
-  },
-]
-
-// ============================================
 // Main Component
 // ============================================
 
 export default function AISminkajanloPage() {
+  const { language } = useLanguage()
+  const t = (hu: string, en: string) => (language === "hu" ? hu : en)
   const { data: session } = useSession()
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const wizardSteps: Step[] = [
+    { id: 1, title: t("Fotó", "Photo") },
+    { id: 2, title: t("Részletek", "Details") },
+    { id: 3, title: t("Eredmények", "Results") },
+  ]
+
+  const makeupStyles = [
+    {
+      value: "everyday",
+      label: t("Hétköznapi", "Everyday"),
+      description: t("Természetes, fresh look minden napra", "Natural, fresh look for daily wear"),
+      icon: "☀️",
+    },
+    {
+      value: "date",
+      label: t("Randi", "Date"),
+      description: t("Romantikus, lágy smink különleges pillanatokra", "Soft, romantic look for special moments"),
+      icon: "💕",
+    },
+    {
+      value: "party",
+      label: t("Buli", "Party"),
+      description: t("Merész, csillogó smink bulizáshoz", "Bold, sparkling look for nights out"),
+      icon: "🎉",
+    },
+    {
+      value: "smokey",
+      label: t("Smokey", "Smokey"),
+      description: t("Intenzív, drámai szemsmink", "Intense, dramatic eye makeup"),
+      icon: "🌙",
+    },
+    {
+      value: "elegant",
+      label: t("Elegáns", "Elegant"),
+      description: t("Kifinomult, elegáns megjelenés", "Refined, elegant look"),
+      icon: "✨",
+    },
+  ]
 
   // State
   const [currentStep, setCurrentStep] = useState<WizardStep>(1)
@@ -155,12 +154,12 @@ export default function AISminkajanloPage() {
 
     const validTypes = ["image/jpeg", "image/png", "image/webp"]
     if (!validTypes.includes(file.type)) {
-      setUploadError("Csak JPG, PNG vagy WebP formátum engedélyezett.")
+      setUploadError(t("Csak JPG, PNG vagy WebP formátum engedélyezett.", "Only JPG, PNG, or WebP formats are allowed."))
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      setUploadError("A kép mérete nem haladhatja meg a 10MB-ot.")
+      setUploadError(t("A kép mérete nem haladhatja meg a 10MB-ot.", "Image size must not exceed 10MB."))
       return
     }
 
@@ -208,7 +207,7 @@ export default function AISminkajanloPage() {
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || "Nem sikerült létrehozni a munkamenetet.")
+        throw new Error(data.error || t("Nem sikerült létrehozni a munkamenetet.", "Failed to create the session."))
       }
 
       const data = await res.json()
@@ -217,7 +216,7 @@ export default function AISminkajanloPage() {
       return data
     } catch (error) {
       setAnalysisError(
-        error instanceof Error ? error.message : "Ismeretlen hiba történt."
+        error instanceof Error ? error.message : t("Ismeretlen hiba történt.", "An unknown error occurred.")
       )
       return null
     } finally {
@@ -236,7 +235,7 @@ export default function AISminkajanloPage() {
       // First create the session
       const sessionData = await createAnalysisSession()
       if (!sessionData) {
-        throw new Error("Nem sikerült létrehozni a munkamenetet.")
+        throw new Error(t("Nem sikerült létrehozni a munkamenetet.", "Failed to create the session."))
       }
 
       // Then use the credit
@@ -248,14 +247,14 @@ export default function AISminkajanloPage() {
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || "Nem sikerült felhasználni a kreditet.")
+        throw new Error(data.error || t("Nem sikerült felhasználni a kreditet.", "Failed to use the credit."))
       }
 
       // Poll for results
       await pollForResults(sessionData.sessionId)
     } catch (error) {
       setAnalysisError(
-        error instanceof Error ? error.message : "Ismeretlen hiba történt."
+        error instanceof Error ? error.message : t("Ismeretlen hiba történt.", "An unknown error occurred.")
       )
       setIsAnalyzing(false)
     }
@@ -277,7 +276,7 @@ export default function AISminkajanloPage() {
       if (packageType === "single" && !sessionId) {
         const sessionData = await createAnalysisSession()
         if (!sessionData) {
-          throw new Error("Nem sikerült létrehozni a munkamenetet.")
+          throw new Error(t("Nem sikerült létrehozni a munkamenetet.", "Failed to create the session."))
         }
         sessionId = sessionData.sessionId
         token = sessionData.guestToken
@@ -296,7 +295,7 @@ export default function AISminkajanloPage() {
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || "Nem sikerült elindítani a fizetést.")
+        throw new Error(data.error || t("Nem sikerült elindítani a fizetést.", "Failed to start payment."))
       }
 
       const data = await res.json()
@@ -305,7 +304,7 @@ export default function AISminkajanloPage() {
       }
     } catch (error) {
       setAnalysisError(
-        error instanceof Error ? error.message : "Ismeretlen hiba történt."
+        error instanceof Error ? error.message : t("Ismeretlen hiba történt.", "An unknown error occurred.")
       )
     } finally {
       setIsProcessingPayment(false)
@@ -320,7 +319,7 @@ export default function AISminkajanloPage() {
       try {
         const res = await fetch(`/api/analysis/${sessionId}`)
         if (!res.ok) {
-          throw new Error("Nem sikerült lekérni az eredményeket.")
+          throw new Error(t("Nem sikerült lekérni az eredményeket.", "Failed to fetch results."))
         }
 
         const data = await res.json()
@@ -336,7 +335,7 @@ export default function AISminkajanloPage() {
         }
 
         if (data.status === "failed") {
-          throw new Error("Az elemzés sikertelen volt.")
+          throw new Error(t("Az elemzés sikertelen volt.", "The analysis failed."))
         }
 
         // Wait before next poll
@@ -347,7 +346,7 @@ export default function AISminkajanloPage() {
       }
     }
 
-    throw new Error("Az elemzés túl sokáig tartott. Kérjük, próbálja újra.")
+    throw new Error(t("Az elemzés túl sokáig tartott. Kérjük, próbálja újra.", "The analysis took too long. Please try again."))
   }
 
   const handleNewAnalysis = () => {
@@ -377,21 +376,22 @@ export default function AISminkajanloPage() {
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2">
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium tracking-wide text-primary">
-                AI Sminkajánló
+                {t("AI Sminkajánló", "AI Makeup Advisor")}
               </span>
             </div>
             <h1 className="mb-4 text-3xl font-light tracking-tight text-foreground md:text-4xl lg:text-5xl">
-              <span className="block font-medium">Személyre szabott sminktanácsok</span>
+              <span className="block font-medium">{t("Személyre szabott sminktanácsok", "Personalized makeup guidance")}</span>
             </h1>
             <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              Töltse fel egy portréfotót, és az AI elemzi arcvonásait, bőrállapotát, majd
-              egy személyre szabott sminkjavaslatot készít az Ön számára — részletes lépésekkel
-              és bőrelőkészítési tippekkel.
+              {t(
+                "Töltse fel egy portréfotót, és az AI elemzi arcvonásait, bőrállapotát, majd egy személyre szabott sminkjavaslatot készít az Ön számára — részletes lépésekkel és bőrelőkészítési tippekkel.",
+                "Upload a portrait photo and the AI will analyze your features and skin condition, then craft a personalized makeup recommendation with detailed steps and skin-prep tips."
+              )}
             </p>
           </div>
 
           {/* Stepper */}
-          <Stepper steps={WIZARD_STEPS} currentStep={currentStep} className="mb-10" />
+          <Stepper steps={wizardSteps} currentStep={currentStep} className="mb-10" />
 
           {/* Step Content */}
           <div className="mx-auto max-w-3xl">
@@ -404,10 +404,10 @@ export default function AISminkajanloPage() {
                       <Camera className="h-7 w-7 text-primary" />
                     </div>
                     <h2 className="text-2xl font-medium tracking-tight text-foreground">
-                      Portréfotó feltöltése
+                      {t("Portréfotó feltöltése", "Upload a portrait photo")}
                     </h2>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Töltsön fel egy jól megvilágított, szemből készült fotót.
+                      {t("Töltsön fel egy jól megvilágított, szemből készült fotót.", "Upload a well-lit, front-facing photo.")}
                     </p>
                   </div>
 
@@ -426,10 +426,10 @@ export default function AISminkajanloPage() {
                             <Upload className="h-5 w-5 text-primary" />
                           </div>
                           <p className="mb-1 text-sm font-medium text-foreground">
-                            Kattintson a feltöltéshez
+                            {t("Kattintson a feltöltéshez", "Click to upload")}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            JPG, PNG vagy WebP • Max. 10MB
+                            {t("JPG, PNG vagy WebP • Max. 10MB", "JPG, PNG or WebP • Max 10MB")}
                           </p>
                         </div>
                       </label>
@@ -446,7 +446,7 @@ export default function AISminkajanloPage() {
                       <div className="relative mx-auto aspect-[3/4] max-w-xs overflow-hidden rounded-[18px] bg-secondary/30">
                         <Image
                           src={uploadedImage}
-                          alt="Feltöltött kép"
+                          alt={t("Feltöltött kép", "Uploaded image")}
                           fill
                           className="object-cover"
                         />
@@ -460,7 +460,7 @@ export default function AISminkajanloPage() {
 
                       <div className="flex justify-center">
                         <Button onClick={() => setCurrentStep(2)}>
-                          Tovább a részletekhez
+                          {t("Tovább a részletekhez", "Continue to details")}
                           <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
                       </div>
@@ -476,20 +476,20 @@ export default function AISminkajanloPage() {
                 <div className="space-y-6">
                   <div className="text-center">
                     <h2 className="text-2xl font-medium tracking-tight text-foreground">
-                      Részletek megadása
+                      {t("Részletek megadása", "Provide details")}
                     </h2>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Adj meg néhány információt a személyre szabott javaslatokhoz.
+                      {t("Adj meg néhány információt a személyre szabott javaslatokhoz.", "Share a few details for personalized recommendations.")}
                     </p>
                   </div>
 
                   <div className="space-y-6">
                     <div>
                       <label className="mb-4 block text-lg font-semibold text-foreground">
-                        Válassz egy smink stílust
+                        {t("Válassz egy smink stílust", "Choose a makeup style")}
                       </label>
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {MAKEUP_STYLES.map((style) => (
+                        {makeupStyles.map((style) => (
                           <button
                             key={style.value}
                             onClick={() => setOccasion(style.value)}
@@ -531,7 +531,7 @@ export default function AISminkajanloPage() {
                           }
                         />
                         <span className="text-sm text-foreground">
-                          Szemüveget hordok
+                          {t("Szemüveget hordok", "I wear glasses")}
                         </span>
                       </label>
                       <label className="flex cursor-pointer items-center gap-3">
@@ -542,7 +542,7 @@ export default function AISminkajanloPage() {
                           }
                         />
                         <span className="text-sm text-foreground">
-                          Érzékeny a bőröm
+                          {t("Érzékeny a bőröm", "I have sensitive skin")}
                         </span>
                       </label>
                     </div>
@@ -558,7 +558,7 @@ export default function AISminkajanloPage() {
                   <div className="flex justify-between">
                     <Button variant="outline" onClick={() => setCurrentStep(1)}>
                       <ArrowLeft className="mr-2 h-4 w-4" />
-                      Vissza
+                      {t("Vissza", "Back")}
                     </Button>
                     <Button
                       onClick={handleShowPaymentModal}
@@ -567,12 +567,12 @@ export default function AISminkajanloPage() {
                       {isCreatingSession ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Folyamatban...
+                          {t("Folyamatban...", "Processing...")}
                         </>
                       ) : (
                         <>
                           <Sparkles className="mr-2 h-4 w-4" />
-                          Elemzés indítása
+                          {t("Elemzés indítása", "Start analysis")}
                         </>
                       )}
                     </Button>
@@ -586,12 +586,18 @@ export default function AISminkajanloPage() {
               <GlassCard variant="elevated" className="text-center py-12">
                 <Loader2 className="mx-auto mb-4 h-12 w-12 animate-spin text-primary" />
                 <h2 className="text-xl font-medium text-foreground mb-2">
-                  Elemzés folyamatban...
+                  {t("Elemzés folyamatban...", "Analysis in progress...")}
                 </h2>
                 <p className="text-muted-foreground">
-                  Az AI éppen dolgozik a személyre szabott javaslataidon.
-                  <br />
-                  Ez általában 1-2 percig tart.
+                  {t(
+                    "Az AI éppen dolgozik a személyre szabott javaslataidon.\nEz általában 1-2 percig tart.",
+                    "The AI is working on your personalized recommendations.\nThis usually takes 1–2 minutes."
+                  ).split("\n").map((line, index) => (
+                    <span key={index}>
+                      {line}
+                      {index === 0 && <br />}
+                    </span>
+                  ))}
                 </p>
               </GlassCard>
             )}
@@ -617,10 +623,10 @@ export default function AISminkajanloPage() {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5 text-primary" />
-              Elemzés fizetése
+              {t("Elemzés fizetése", "Pay for analysis")}
             </DialogTitle>
             <DialogDescription>
-              Válassz fizetési módot az elemzés indításához.
+              {t("Válassz fizetési módot az elemzés indításához.", "Choose a payment option to start the analysis.")}
             </DialogDescription>
           </DialogHeader>
 
@@ -637,15 +643,15 @@ export default function AISminkajanloPage() {
                       </div>
                       <div>
                         <p className="font-medium text-foreground">
-                          Kredit használata
+                          {t("Kredit használata", "Use a credit")}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          {userCredits} kredit elérhető
+                          {t(`${userCredits} kredit elérhető`, `${userCredits} credits available`)}
                         </p>
                       </div>
                     </div>
                     <Button onClick={handleUseCredit} size="sm">
-                      Indítás
+                      {t("Indítás", "Start")}
                     </Button>
                   </div>
                 </div>
@@ -659,10 +665,10 @@ export default function AISminkajanloPage() {
                       </div>
                       <div>
                         <p className="font-medium text-foreground">
-                          Azonnali fizetés
+                          {t("Azonnali fizetés", "Instant payment")}
                         </p>
                         <p className="text-sm text-muted-foreground">
-                          1 elemzés - 450 Ft
+                          {t("1 elemzés - 450 Ft", "1 analysis - 450 Ft")}
                         </p>
                       </div>
                     </div>
@@ -675,7 +681,7 @@ export default function AISminkajanloPage() {
                       {isProcessingPayment ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        "Fizetés"
+                        t("Fizetés", "Pay")
                       )}
                     </Button>
                   </div>
@@ -691,10 +697,10 @@ export default function AISminkajanloPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">
-                        Azonnali fizetés
+                        {t("Azonnali fizetés", "Instant payment")}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        1 elemzés - 450 Ft
+                        {t("1 elemzés - 450 Ft", "1 analysis - 450 Ft")}
                       </p>
                     </div>
                   </div>
@@ -706,7 +712,7 @@ export default function AISminkajanloPage() {
                     {isProcessingPayment ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      "Fizetés"
+                      t("Fizetés", "Pay")
                     )}
                   </Button>
                 </div>
@@ -720,7 +726,7 @@ export default function AISminkajanloPage() {
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-background px-2 text-muted-foreground">
-                  További lehetőségek
+                  {t("További lehetőségek", "More options")}
                 </span>
               </div>
             </div>
@@ -731,13 +737,13 @@ export default function AISminkajanloPage() {
                 <Button variant="outline" asChild size="sm" className="h-auto py-3 flex-col">
                   <Link href={`/regisztracio?callbackUrl=${encodeURIComponent('/ai-sminkajanlo')}`}>
                     <UserPlus className="mb-1 h-4 w-4" />
-                    <span className="text-xs">Regisztráció</span>
+                    <span className="text-xs">{t("Regisztráció", "Sign up")}</span>
                   </Link>
                 </Button>
                 <Button variant="outline" asChild size="sm" className="h-auto py-3 flex-col">
                   <Link href={`/bejelentkezes?callbackUrl=${encodeURIComponent('/ai-sminkajanlo')}`}>
                     <LogIn className="mb-1 h-4 w-4" />
-                    <span className="text-xs">Bejelentkezés</span>
+                    <span className="text-xs">{t("Bejelentkezés", "Sign in")}</span>
                   </Link>
                 </Button>
               </div>
@@ -747,7 +753,7 @@ export default function AISminkajanloPage() {
             {session?.user && (
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground text-center">
-                  Spórolj kredit csomagokkal:
+                  {t("Spórolj kredit csomagokkal:", "Save with credit packs:")}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   <button
@@ -755,7 +761,7 @@ export default function AISminkajanloPage() {
                     disabled={isProcessingPayment}
                     className="rounded-[12px] border border-border bg-background p-3 text-center transition-colors hover:bg-secondary/50 disabled:opacity-50"
                   >
-                    <p className="text-lg font-semibold text-foreground">5 kredit</p>
+                    <p className="text-lg font-semibold text-foreground">{t("5 kredit", "5 credits")}</p>
                     <p className="text-xs text-muted-foreground">2 025 Ft</p>
                     <p className="text-xs text-primary">-10%</p>
                   </button>
@@ -764,7 +770,7 @@ export default function AISminkajanloPage() {
                     disabled={isProcessingPayment}
                     className="rounded-[12px] border-2 border-primary bg-primary/5 p-3 text-center transition-colors hover:bg-primary/10 disabled:opacity-50"
                   >
-                    <p className="text-lg font-semibold text-foreground">10 kredit</p>
+                    <p className="text-lg font-semibold text-foreground">{t("10 kredit", "10 credits")}</p>
                     <p className="text-xs text-muted-foreground">4 000 Ft</p>
                     <p className="text-xs text-primary font-medium">-11%</p>
                   </button>

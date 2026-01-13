@@ -1,4 +1,23 @@
+"use client"
+
+import { useLanguage } from "@/components/language-provider"
+
 export function Footer() {
+  const { language } = useLanguage()
+  const copy = language === "hu" ? {
+    tagline: "Személyre szabott szépségkonzultáció",
+    terms: "Felhasználási feltételek",
+    privacy: "Adatvédelem",
+    contact: "Kapcsolat",
+    rights: "2025 MAGIC FIT. Minden jog fenntartva.",
+  } : {
+    tagline: "Personalized beauty consultation",
+    terms: "Terms of service",
+    privacy: "Privacy",
+    contact: "Contact",
+    rights: "2025 MAGIC FIT. All rights reserved.",
+  }
+
   return (
     <footer id="kapcsolat" className="relative overflow-hidden border-t border-border/50 bg-secondary/30 px-4 py-16 md:py-20">
       <div className="container mx-auto max-w-6xl">
@@ -11,7 +30,7 @@ export function Footer() {
               <h3 className="text-xl font-medium tracking-tight text-foreground">MAGIC FIT</h3>
             </div>
             <p className="text-sm tracking-wide text-muted-foreground">
-              Személyre szabott szépségkonzultáció
+              {copy.tagline}
             </p>
           </div>
 
@@ -20,19 +39,19 @@ export function Footer() {
               href="/felhasznalasi-feltetelek"
               className="tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
-              Felhasználási feltételek
+              {copy.terms}
             </a>
             <a
               href="/adatvedelem"
               className="tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
-              Adatvédelem
+              {copy.privacy}
             </a>
             <a
-              href="#kapcsolat"
+              href="/kapcsolat"
               className="tracking-wide text-muted-foreground transition-colors duration-300 hover:text-foreground"
             >
-              Kapcsolat
+              {copy.contact}
             </a>
           </nav>
         </div>
@@ -40,7 +59,7 @@ export function Footer() {
         <div className="divider-elegant mt-12 mb-8" />
 
         <div className="text-center text-sm tracking-wide text-muted-foreground/70">
-          <p>2025 MAGIC FIT. Minden jog fenntartva.</p>
+          <p>{copy.rights}</p>
         </div>
       </div>
     </footer>
