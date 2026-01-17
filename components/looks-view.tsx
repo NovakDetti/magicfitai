@@ -201,10 +201,10 @@ export function LooksView({
                 beforeImage={beforeImageUrl}
                 afterImage={activeLook.afterImageUrl}
                 aspectRatio="portrait"
-                initialPosition={["nappali", "elegans"].includes(lookType) ? 65 : 50}
+                initialPosition={["nappali", "elegans"].includes(lookType) ? 75 : 50}
                 afterImageClassName={
                   ["nappali", "elegans"].includes(lookType)
-                    ? "contrast-[1.05] saturate-[1.05]"
+                    ? "contrast-[1.12] saturate-[1.1]"
                     : undefined
                 }
               />

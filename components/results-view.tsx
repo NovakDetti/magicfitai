@@ -121,7 +121,7 @@ export function ResultsView({
                     viewMode[look.id] === "after" &&
                       look.afterImageUrl &&
                       (index === 0 || index === 1)
-                      ? "contrast-[1.05] saturate-[1.05]"
+                      ? "contrast-[1.12] saturate-[1.1]"
                       : null
                   )}
                 />
