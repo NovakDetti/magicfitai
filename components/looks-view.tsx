@@ -201,6 +201,12 @@ export function LooksView({
                 beforeImage={beforeImageUrl}
                 afterImage={activeLook.afterImageUrl}
                 aspectRatio="portrait"
+                initialPosition={["nappali", "elegans"].includes(lookType) ? 65 : 50}
+                afterImageClassName={
+                  ["nappali", "elegans"].includes(lookType)
+                    ? "contrast-[1.05] saturate-[1.05]"
+                    : undefined
+                }
               />
             ) : (
               <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-secondary/30">

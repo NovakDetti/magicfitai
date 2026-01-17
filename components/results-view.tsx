@@ -116,7 +116,14 @@ export function ResultsView({
                       : t("Előtte", "Before")
                   }
                   fill
-                  className="object-cover"
+                  className={cn(
+                    "object-cover",
+                    viewMode[look.id] === "after" &&
+                      look.afterImageUrl &&
+                      (index === 0 || index === 1)
+                      ? "contrast-[1.05] saturate-[1.05]"
+                      : null
+                  )}
                 />
               )}
 

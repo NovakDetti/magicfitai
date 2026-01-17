@@ -9,6 +9,9 @@ interface BeforeAfterSliderProps {
   afterImage: string
   beforeLabel?: string
   afterLabel?: string
+  beforeImageClassName?: string
+  afterImageClassName?: string
+  initialPosition?: number
   className?: string
   aspectRatio?: "square" | "portrait" | "landscape"
 }
@@ -27,11 +30,14 @@ export function BeforeAfterSlider({
   afterImage,
   beforeLabel = "Előtte",
   afterLabel = "Utána",
+  beforeImageClassName,
+  afterImageClassName,
+  initialPosition = 50,
   className,
   aspectRatio = "portrait",
 }: BeforeAfterSliderProps) {
   const containerRef = React.useRef<HTMLDivElement>(null)
-  const [sliderPosition, setSliderPosition] = React.useState(50)
+  const [sliderPosition, setSliderPosition] = React.useState(initialPosition)
   const [isDragging, setIsDragging] = React.useState(false)
 
   const aspectRatioClass = {
@@ -127,7 +133,7 @@ export function BeforeAfterSlider({
           src={afterImage}
           alt={afterLabel}
           fill
-          className="object-cover"
+          className={cn("object-cover", afterImageClassName)}
           draggable={false}
         />
       </div>
@@ -142,7 +148,7 @@ export function BeforeAfterSlider({
             src={beforeImage}
             alt={beforeLabel}
             fill
-            className="object-cover"
+            className={cn("object-cover", beforeImageClassName)}
             draggable={false}
           />
         </div>
