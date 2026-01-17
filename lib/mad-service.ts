@@ -31,11 +31,11 @@ export interface MakeupTransferResult {
 // Map our style IDs to Fal.ai makeup styles
 // Using medium intensity to better preserve facial proportions
 const STYLE_MAP: Record<string, { style: string; intensity: string }> = {
-  everyday: { style: "natural", intensity: "light" },
+  everyday: { style: "natural", intensity: "medium" },
   date: { style: "glamorous", intensity: "medium" },
   party: { style: "dramatic", intensity: "medium" },
   smokey: { style: "smoky_eyes", intensity: "medium" },
-  elegant: { style: "professional", intensity: "medium" },
+  elegant: { style: "professional", intensity: "heavy" },
 }
 
 /**
