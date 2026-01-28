@@ -9,6 +9,7 @@ import { Navigation } from "@/components/navigation"
 import { GlassCard } from "@/components/ui/glass-card"
 import { Button } from "@/components/ui/button"
 import { SignatureLookResults } from "@/components/signature-look-results"
+import { RatingForm } from "@/components/rating-form"
 import type { AnalysisObservations, MakeupLook, AnalysisToggles } from "@/lib/db/schema"
 import { useLanguage } from "@/components/language-provider"
 
@@ -233,6 +234,11 @@ export default function AnalysisDetailPage({
             beforeImageUrl={analysis.beforeImageUrl}
             isLoggedIn={!!session?.user}
           />
+
+          {/* Rating Form */}
+          <div className="mt-8">
+            <RatingForm analysisId={analysis.id} />
+          </div>
         </div>
       </main>
     </>

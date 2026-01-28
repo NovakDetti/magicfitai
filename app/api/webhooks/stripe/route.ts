@@ -70,8 +70,10 @@ export async function POST(request: NextRequest) {
           .where(eq(analysisSessions.id, analysisSessionId))
 
         // Start processing in the background
+        // NOTE: processAnalysisSession will handle refunds automatically if it fails
         processAnalysisSession(analysisSessionId).catch((error) => {
-          console.error("Analysis processing failed:", error)
+          console.error("Analysis processing failed (webhook):", error)
+          // Error is already logged and refund is already handled in processAnalysisSession
         })
       } else if (userId) {
         // Credit purchase - add credits to user account

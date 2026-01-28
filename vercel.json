@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-stuck-analyses",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}

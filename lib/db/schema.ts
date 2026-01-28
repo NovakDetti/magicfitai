@@ -199,11 +199,12 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   creditLedger: many(creditLedger),
 }))
 
-export const analysisSessionsRelations = relations(analysisSessions, ({ one }) => ({
+export const analysisSessionsRelations = relations(analysisSessions, ({ one, many }) => ({
   user: one(users, {
     fields: [analysisSessions.userId],
     references: [users.id],
   }),
+  ratings: many(analysisRatings),
 }))
 
 export const userCreditsRelations = relations(userCredits, ({ one }) => ({
@@ -221,5 +222,39 @@ export const creditLedgerRelations = relations(creditLedger, ({ one }) => ({
   analysisSession: one(analysisSessions, {
     fields: [creditLedger.analysisSessionId],
     references: [analysisSessions.id],
+  }),
+}))
+
+// ============================================
+// Ratings / Reviews
+// ============================================
+
+export const analysisRatings = pgTable(
+  "analysis_ratings",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    analysisSessionId: uuid("analysis_session_id")
+      .notNull()
+      .references(() => analysisSessions.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+    rating: integer("rating").notNull(), // 1-5 stars
+    comment: text("comment"), // Optional text feedback
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("analysis_ratings_session_id_idx").on(table.analysisSessionId),
+    index("analysis_ratings_user_id_idx").on(table.userId),
+  ]
+)
+
+export const analysisRatingsRelations = relations(analysisRatings, ({ one }) => ({
+  analysisSession: one(analysisSessions, {
+    fields: [analysisRatings.analysisSessionId],
+    references: [analysisSessions.id],
+  }),
+  user: one(users, {
+    fields: [analysisRatings.userId],
+    references: [users.id],
   }),
 }))
