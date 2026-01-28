@@ -115,8 +115,10 @@ export async function analyzeImage(
     throw new Error("GEMINI_API_KEY is not configured")
   }
 
-  // Use Gemini 2.0 Flash Experimental (supports vision tasks)
-  const model = process.env.GEMINI_MODEL || "gemini-2.0-flash-exp"
+  // Use Gemini 2.0 Flash (supports vision tasks)
+  // Note: "gemini-2.0-flash-exp" was experimental and may not be available
+  // Use stable version instead
+  const model = process.env.GEMINI_MODEL || "gemini-2.0-flash-001"
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
 
   // Get style configuration
@@ -445,7 +447,7 @@ export async function analyzeSkinCondition(
     throw new Error("GEMINI_API_KEY is not configured")
   }
 
-  const model = process.env.GEMINI_MODEL || "gemini-2.0-flash-exp"
+  const model = process.env.GEMINI_MODEL || "gemini-2.0-flash-001"
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`
 
   const response = await fetch(url, {
